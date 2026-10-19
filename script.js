@@ -657,45 +657,85 @@
       const wordSpan = document.createElement('span');
       wordSpan.className = 'word-reveal';
       wordSpan.style.display = 'inline-block';
-      wordSpan.style.opacity = '0.15';
+      wordSpan.style.opacity = '0.45';
       wordSpan.innerHTML = word + '&nbsp;';
       textEl.appendChild(wordSpan);
     });
 
     gsap.to('.word-reveal', {
       opacity: 1,
-      stagger: 0.03,
-      ease: 'none',
+      color: '#FAF4EB',
+      stagger: 0.02,
+      ease: 'power1.out',
       scrollTrigger: {
         trigger: '.sobre-intro-grid',
         start: 'top 85%',
         end: 'bottom 65%',
-        scrub: 0.35
+        scrub: 0.25
       }
     });
   }
 
   /* ------------------------------------------------------------------------
-     5.2 ANIMAÇÃO DE ENFOQUE (UNBLUR)
+     5.2 ANIMAÇÃO DE ENFOQUE & TELEMETRIA CAD (Zero Blur)
      ------------------------------------------------------------------------ */
   function initSobreImageFocusReveal() {
-    const imgEl = document.querySelector('.sobre-blur-img');
+    const imgEl = document.querySelector('.sobre-clean-img, .sobre-blur-img');
+    const badgeEl = document.querySelector('.cad-telemetry-badge');
+    const crosshairs = document.querySelectorAll('.cad-crosshair');
     if (!imgEl) return;
 
+    // Zoom cinematográfico suave sem borrões
     gsap.fromTo(imgEl, 
-      { scale: 0.96, opacity: 0.9 },
+      { scale: 1.08 },
       {
         scale: 1,
-        opacity: 1,
         ease: 'power2.out',
         scrollTrigger: {
           trigger: '.sobre-intro-grid',
           start: 'top 85%',
-          end: 'bottom 50%',
-          scrub: 0.3
+          end: 'bottom 45%',
+          scrub: 0.35
         }
       }
     );
+
+    // Entrada elegante do badge de telemetria CAD
+    if (badgeEl) {
+      gsap.fromTo(badgeEl,
+        { y: 20, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: '.sobre-intro-grid',
+            start: 'top 75%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
+
+    // Brilho dos crosshairs CAD
+    if (crosshairs.length > 0) {
+      gsap.fromTo(crosshairs,
+        { opacity: 0.2, scale: 0.8 },
+        {
+          opacity: 0.7,
+          scale: 1,
+          duration: 0.9,
+          stagger: 0.1,
+          ease: 'power2.out',
+          scrollTrigger: {
+            trigger: '.sobre-intro-grid',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+          }
+        }
+      );
+    }
   }
 
   /* ------------------------------------------------------------------------

@@ -1224,16 +1224,27 @@ section {
 }
 
 /* ==========================================================================
-   6. SEÇÃO SOBRE
+   6. SEÇÃO SOBRE (Awwwards SOTD Architectural Cad Design)
    ========================================================================== */
+.gold-text {
+  color: var(--gold);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #FAF4EB 0%, #F5E4C7 35%, #C8A46B 75%, #E5CCA0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
 .sobre-pill {
   margin-bottom: 24px;
 }
 
 .sobre-intro-grid {
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: clamp(48px, 5vw, 84px);
+  grid-template-columns: 1.12fr 0.88fr;
+  gap: clamp(48px, 5.5vw, 92px);
   align-items: center;
   margin-bottom: clamp(80px, 11vh, 130px);
 }
@@ -1246,7 +1257,7 @@ section {
 
 .sobre-intro-left h2 {
   font-family: var(--font-display);
-  font-size: clamp(24px, 2.8vw, 38px);
+  font-size: clamp(26px, 3.2vw, 44px);
   font-weight: 800;
   line-height: 1.08;
   margin-bottom: 24px;
@@ -1257,40 +1268,197 @@ section {
 
 .sobre-text-trigger {
   font-family: var(--font-main);
-  font-size: clamp(16px, 1.45vw, 19px);
+  font-size: clamp(16px, 1.4vw, 19px);
   color: var(--text-gray);
-  line-height: 1.7;
+  line-height: 1.75;
   font-weight: 400;
   letter-spacing: -0.01em;
+  margin-bottom: 32px;
 }
 
 .word-reveal {
   display: inline-block;
-  will-change: opacity;
+  will-change: opacity, color;
+  transition: opacity 0.3s ease;
+}
+
+.sobre-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.btn-gold-sm {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--gold);
+  color: var(--black-pure);
+  font-family: var(--font-main);
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  transition: all .35s var(--ease-smooth);
+  box-shadow: 0 4px 20px rgba(200, 164, 107, 0.25);
+}
+
+.btn-gold-sm:hover {
+  background: var(--gold-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(200, 164, 107, 0.4);
+}
+
+.btn-gold-sm svg {
+  transition: transform .35s var(--ease-smooth);
+}
+
+.btn-gold-sm:hover svg {
+  transform: translateX(4px);
+}
+
+.sobre-cert-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cert-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 8px var(--gold);
 }
 
 .sobre-intro-right {
   position: relative;
 }
 
+/* Authentic Awwwards CAD Architectural Image Frame (Zero Blur / Alta Definição) */
 .sobre-image-wrapper {
   position: relative;
   width: 100%;
-  height: 460px;
+  height: clamp(400px, 36vw, 500px);
   border-radius: 20px;
   overflow: hidden;
-  border: 1px solid var(--border);
-  box-shadow: var(--card-shadow);
-  transition: box-shadow .4s ease;
+  border: 1px solid rgba(245, 228, 199, 0.16);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(200, 164, 107, 0.08);
+  background: #0E0C0A;
+  transition: border-color 0.45s ease, box-shadow 0.45s ease;
 }
 
+.sobre-image-wrapper:hover {
+  border-color: rgba(200, 164, 107, 0.35);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.8), 0 0 50px rgba(200, 164, 107, 0.15);
+}
+
+/* Imagem 100% nítida, cinematográfica e de alto impacto editorial */
+.sobre-clean-img,
 .sobre-blur-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: blur(20px);
-  transform: scale(1.15);
-  will-change: transform, filter;
+  filter: contrast(1.05) brightness(0.96) saturate(1.05);
+  transform: scale(1);
+  will-change: transform;
+  transition: transform 0.85s var(--ease-smooth);
+}
+
+.sobre-image-wrapper:hover .sobre-clean-img,
+.sobre-image-wrapper:hover .sobre-blur-img {
+  transform: scale(1.04);
+}
+
+.sobre-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(8, 8, 8, 0.05) 0%, rgba(8, 8, 8, 0.25) 55%, rgba(8, 8, 8, 0.85) 100%);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* CAD Crosshairs (Heron AI & Nick Ho Signature Marks) */
+.cad-crosshair {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--cream);
+  opacity: 0.6;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.cad-tl { top: 12px; left: 14px; }
+.cad-tr { top: 12px; right: 14px; }
+.cad-bl { bottom: 12px; left: 14px; }
+.cad-br { bottom: 12px; right: 14px; }
+
+/* CAD Telemetry Badge Overlay */
+.cad-telemetry-badge {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  padding: 12px 18px;
+  background: rgba(12, 10, 8, 0.82);
+  border: 1px solid rgba(245, 228, 199, 0.15);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.cad-telemetry-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cad-telemetry-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #25D366;
+  box-shadow: 0 0 10px #25D366;
+  animation: telemetryPulse 2s infinite ease-in-out;
+}
+
+@keyframes telemetryPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.cad-telemetry-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--cream);
+  text-transform: uppercase;
+}
+
+.cad-telemetry-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--gold);
+  letter-spacing: 0.06em;
 }
 
 /* Buck's Sauce Caliber Metric Rail */
@@ -1298,14 +1466,14 @@ section {
   display: grid;
   grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
   align-items: center;
-  background: rgba(18, 14, 10, 0.65);
-  border: 1px solid rgba(245, 228, 199, 0.12);
+  background: linear-gradient(135deg, rgba(22, 18, 14, 0.7) 0%, rgba(12, 10, 8, 0.85) 100%);
+  border: 1px solid rgba(245, 228, 199, 0.14);
   border-radius: 20px;
-  padding: clamp(28px, 3.5vw, 42px) clamp(20px, 3vw, 40px);
+  padding: clamp(32px, 3.8vw, 46px) clamp(24px, 3vw, 44px);
   margin-bottom: clamp(90px, 12vh, 140px);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45), 0 0 35px rgba(200, 164, 107, 0.05);
 }
 
 .metric-item {
@@ -1318,78 +1486,111 @@ section {
 
 .metric-num {
   font-family: var(--font-mono);
-  font-size: clamp(28px, 3.2vw, 42px);
+  font-size: clamp(32px, 3.8vw, 48px);
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.04em;
   color: var(--cream);
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .metric-plus,
 .metric-pct {
   color: var(--gold);
-  font-size: 0.75em;
+  font-size: 0.72em;
   margin-left: 2px;
 }
 
 .metric-lbl {
   font-family: var(--font-main);
-  font-size: clamp(12px, 1.05vw, 14px);
+  font-size: clamp(12px, 1.05vw, 13.5px);
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.04em;
   color: var(--text-gray);
   text-transform: uppercase;
 }
 
 .metric-divider {
   width: 1px;
-  height: 52px;
-  background: rgba(245, 228, 199, 0.12);
+  height: 56px;
+  background: linear-gradient(to bottom, transparent, rgba(200, 164, 107, 0.35), transparent);
 }
 
-/* Diferenciais Grid */
+/* Diferenciais Grid (Awwwards Card Architecture) */
 .diff-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: clamp(32px, 3.5vw, 56px);
+  gap: clamp(28px, 3.2vw, 44px);
 }
 
 .diff-card {
-  text-align: center;
-  padding: 0 16px;
+  position: relative;
+  text-align: left;
+  padding: clamp(34px, 3.4vw, 46px) clamp(28px, 2.8vw, 38px);
+  background: linear-gradient(145deg, rgba(22, 19, 16, 0.6) 0%, rgba(12, 10, 8, 0.8) 100%);
+  border: 1px solid rgba(245, 228, 199, 0.12);
+  border-radius: 20px;
+  box-shadow: var(--card-shadow);
+  transition: all 0.45s var(--ease-smooth);
+  display: flex;
+  flex-direction: column;
+}
+
+.diff-card:hover {
+  border-color: rgba(200, 164, 107, 0.4);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 30px rgba(200, 164, 107, 0.12);
+}
+
+.diff-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
 }
 
 .diff-icon {
-  width: 74px;
-  height: 74px;
-  margin: 0 auto 28px;
+  width: 62px;
+  height: 62px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid rgba(245, 228, 199, .3);
-  border-radius: 50%;
+  background: rgba(200, 164, 107, 0.08);
+  border: 1px solid rgba(200, 164, 107, 0.28);
+  border-radius: 16px;
   color: var(--cream);
-  transition: box-shadow .5s var(--ease-smooth), border-color .5s var(--ease-smooth);
+  transition: all .45s var(--ease-smooth);
 }
 
 .diff-card:hover .diff-icon {
-  box-shadow: 0 0 0 8px rgba(245, 228, 199, .06), 0 0 30px rgba(245, 228, 199, .25);
-  border-color: var(--cream);
+  background: rgba(200, 164, 107, 0.18);
+  border-color: var(--gold);
+  color: var(--gold);
+  box-shadow: 0 0 20px rgba(200, 164, 107, 0.3);
 }
 
 .diff-icon svg {
-  width: 30px;
-  height: 30px;
+  width: 26px;
+  height: 26px;
+}
+
+.diff-index {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--gold);
+  opacity: 0.85;
 }
 
 .diff-card h3 {
   font-family: var(--font-display);
-  font-size: clamp(18px, 1.6vw, 22px);
+  font-size: clamp(19px, 1.7vw, 23px);
   font-weight: 700;
   margin-bottom: 14px;
   color: var(--white);
   letter-spacing: -0.015em;
+  text-transform: uppercase;
 }
 
 .diff-card p {
@@ -1411,17 +1612,23 @@ section {
   margin-bottom: clamp(60px, 8vh, 100px);
 }
 
-.service-card,
-.project-card {
+.service-card {
   position: relative;
-  border-radius: 16px;
+  border-radius: 20px;
   overflow: hidden;
-  background: var(--gray-dark);
-  border: 1px solid var(--border);
+  background: linear-gradient(160deg, rgba(22, 19, 16, 0.7) 0%, rgba(12, 10, 8, 0.95) 100%);
+  border: 1px solid rgba(245, 228, 199, 0.12);
   will-change: transform, border-color, box-shadow;
-  transform-style: preserve-3d;
-  box-shadow: var(--card-shadow);
-  transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  transition: all 0.45s var(--ease-smooth);
+  display: flex;
+  flex-direction: column;
+}
+
+.service-card:hover {
+  border-color: rgba(200, 164, 107, 0.45);
+  transform: translateY(-6px);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(200, 164, 107, 0.12);
 }
 
 .card-shine {
@@ -1436,46 +1643,81 @@ section {
   transition: opacity 0.4s ease;
 }
 
-.service-media,
-.project-card-media-wrapper {
+.service-media {
   position: relative;
-  height: 230px;
+  height: 250px;
   overflow: hidden;
-  pointer-events: none;
 }
 
-.project-card {
-  height: 420px;
+.service-badge-tag {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  background: rgba(12, 10, 8, 0.82);
+  border: 1px solid rgba(245, 228, 199, 0.2);
+  border-radius: 9999px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--cream);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  z-index: 3;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
-.project-card img,
+.service-badge-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 6px var(--gold);
+}
+
 .service-media img {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  will-change: transform;
+  filter: contrast(1.05) brightness(0.92);
+  transform: scale(1);
+  transition: transform 0.85s var(--ease-smooth);
+}
+
+.service-card:hover .service-media img {
+  transform: scale(1.06);
 }
 
 .service-media::after {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, .85) 100%);
+  background: linear-gradient(180deg, rgba(8, 8, 8, 0.2) 0%, rgba(8, 8, 8, 0.1) 40%, rgba(12, 10, 8, 0.95) 100%);
+  pointer-events: none;
+  z-index: 2;
 }
 
 .service-body {
-  padding: 32px 30px 36px;
+  padding: 28px 30px 34px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
 }
 
 .service-body h3 {
   font-family: var(--font-display);
-  font-size: clamp(19px, 1.6vw, 22px);
+  font-size: clamp(20px, 1.7vw, 24px);
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
   color: var(--white);
+  text-transform: uppercase;
 }
 
 .service-body p {
@@ -1486,6 +1728,7 @@ section {
   line-height: 1.65;
   letter-spacing: -0.01em;
   margin-bottom: 26px;
+  flex-grow: 1;
 }
 
 .service-bucks-link {
