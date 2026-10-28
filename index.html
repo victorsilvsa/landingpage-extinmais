@@ -32,9 +32,8 @@
         var cores = navigator.hardwareConcurrency || 4;
         var conn = navigator.connection;
         var isDataSaver = conn && (conn.saveData || /2g|3g/.test(conn.effectiveType));
-        var isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
         var isUltra = (mem <= 2) || (cores <= 2) || isDataSaver;
-        var isLow = isUltra || (mem <= 3) || (cores <= 4) || (isTouch && window.innerWidth <= 600);
+        var isLow = isUltra || (mem <= 3 && cores <= 4);
         if (isUltra) document.documentElement.classList.add('ultra-low-end');
         if (isLow) document.documentElement.classList.add('low-perf');
       } catch (e) { }

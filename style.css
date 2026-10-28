@@ -183,12 +183,11 @@ svg {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: high-quality;
+  image-rendering: auto;
   transform: translate3d(0, 0, 0);
   backface-visibility: hidden;
   /* Visual cinematográfico nítido e de alta gama sem blur destrutivo */
-  filter: saturate(var(--canvas-saturate, 105%)) contrast(var(--canvas-contrast, 108%)) brightness(var(--canvas-brightness, 100%));
+  filter: saturate(var(--canvas-saturate, 104%)) contrast(var(--canvas-contrast, 106%)) brightness(var(--canvas-brightness, 98%));
 }
 
 #bg-canvas-wrap::after {
@@ -2627,9 +2626,10 @@ footer {
 }
 
 @media (max-width:940px) {
-  /* Otimização de GPU Mobile: Mantém canvas nítido sem filtros de blur pesados */
+  /* Otimização de GPU Mobile: Mantém canvas nítido com interpolação suave em telas Retina */
   #bg-canvas {
-    filter: saturate(105%) contrast(108%) brightness(100%) !important;
+    image-rendering: auto !important;
+    filter: saturate(104%) contrast(106%) brightness(98%) !important;
     transform: translate3d(0, 0, 0);
   }
 
@@ -3263,13 +3263,6 @@ html.ultra-low-end .whatsapp-tooltip,
 html.low-perf .whatsapp-tooltip {
   background: #12100E !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6) !important;
-}
-
-/* Otimização de renderização do canvas */
-html.ultra-low-end #bg-canvas,
-html.low-perf #bg-canvas {
-  image-rendering: -webkit-optimize-contrast;
-  image-rendering: crisp-edges;
 }
 
 /* Redução de transições de GPU custosas */

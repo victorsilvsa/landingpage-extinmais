@@ -53,7 +53,7 @@
     } catch (e) {}
 
     const isUltraLowEnd = mem <= 2 || cores <= 2 || isDataSaver || isLowTierGPU;
-    const isLowEnd = isUltraLowEnd || mem <= 3 || cores <= 4 || (isTouch && window.innerWidth <= 600);
+    const isLowEnd = isUltraLowEnd || (mem <= 3 && cores <= 4);
 
     return {
       isUltraLowEnd,
@@ -76,7 +76,7 @@
   }
 
   // Configuração adaptativa de amostragem de frames e DPR
-  const frameStride = hardwareProfile.isUltraLowEnd ? 4 : (hardwareProfile.isLowEnd ? 2 : 1);
+  const frameStride = hardwareProfile.isUltraLowEnd ? 2 : 1;
   const totalFrames = 240;
   const framePrefix = 'ezgif-frame-';
   const frameExt = '.jpg';
@@ -128,12 +128,11 @@
   function resizeCanvas() {
     if (!canvas || !ctx) return;
     
-    // DPR adaptativo: 1.0 para aparelhos fracos (economiza 75% de fill-rate), até 1.75 para telas Retina
-    let dpr = 1.0;
-    if (!hardwareProfile.isUltraLowEnd) {
-      dpr = hardwareProfile.isLowEnd 
-        ? Math.min(window.devicePixelRatio || 1, 1.2)
-        : Math.min(window.devicePixelRatio || 1, 1.75);
+    // Suporte de alta definição a telas Retina / OLED no mobile
+    const nativeDpr = window.devicePixelRatio || 1;
+    let dpr = Math.min(Math.max(nativeDpr, 1.5), 2.25);
+    if (hardwareProfile.isUltraLowEnd) {
+      dpr = Math.min(nativeDpr, 1.25);
     }
 
     const w = window.innerWidth;
@@ -143,7 +142,7 @@
     canvas.height = Math.round(h * dpr);
 
     ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = hardwareProfile.isUltraLowEnd ? 'low' : 'medium';
+    ctx.imageSmoothingQuality = 'high';
 
     drawFrame(Math.round(frameState.current));
   }
@@ -171,6 +170,10 @@
     }
 
     if (!img || !img.complete || !img.naturalWidth) return;
+
+    // Garante interpolação bicúbica nítida de alta precisão em cada renderização
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
 
     const cw = canvas.width;
     const ch = canvas.height;
