@@ -276,14 +276,14 @@
 
     if (loadingLogoBrand) gsap.set(loadingLogoBrand, { opacity: 0, scale: 0.92 });
 
-    // Animate blueprint vector drawing
+    // Animação acelerada e dinâmica dos traços técnicos (~0.65s)
     if (svgPaths.length > 0) {
       gsap.to(svgPaths, {
         strokeDashoffset: 0,
-        duration: 1.2,
-        stagger: { amount: 1.4, from: 'start' },
+        duration: 0.65,
+        stagger: { amount: 0.35, from: 'start' },
         ease: 'power2.out',
-        delay: 0.1
+        delay: 0.05
       });
     }
 
@@ -291,9 +291,9 @@
       gsap.to(loadingLogoBrand, {
         opacity: 1,
         scale: 1,
-        duration: 0.9,
+        duration: 0.45,
         ease: 'power2.out',
-        delay: 0.4
+        delay: 0.15
       });
     }
   }
@@ -301,85 +301,60 @@
   function loadAssets() {
     initHeronPreloader();
 
+    const progressState = { val: 0 };
+    const loadDuration = 0.85; // Entrada veloz e ultra-fluida (< 1 segundo)
+
+    // Renderiza o frame inicial imediatamente para desenhar no canvas sem tela branca
+    const firstImg = new Image();
+    firstImg.decoding = 'async';
+    firstImg.onload = () => {
+      images[0] = firstImg;
+      drawFrame(0);
+    };
+    firstImg.src = getFrameUrl(0);
+
+    // Carrega frames prioritários em paralelo de forma assíncrona
     let priorityLoaded = 0;
     const totalPriority = priorityIndices.length;
-    const progressState = { val: 0 };
-    const loadDuration = 2.6;
-
-    // Garante que o modelo 3D do Extintor seja carregado antes do término do Preloader
-    const mv = document.getElementById('extintorModel');
-    let extintorReady = !mv || Boolean(mv.loaded);
-    let tweenFinished = false;
-
-    function tryReleasePreloader() {
-      if (tweenFinished && extintorReady && !screenReleased) {
-        finishPreload();
-        streamRemainingFrames();
-      }
-    }
-
-    if (mv && !extintorReady) {
-      mv.addEventListener('load', () => {
-        extintorReady = true;
-        tryReleasePreloader();
-      }, { once: true });
-      mv.addEventListener('error', () => {
-        extintorReady = true;
-        tryReleasePreloader();
-      }, { once: true });
-    }
-
-    // Smooth counter animation interpolating between real load events and GSAP timeline
-    const progressTween = gsap.to(progressState, {
-      val: 100,
-      duration: loadDuration,
-      ease: 'power2.out',
-      onUpdate: () => {
-        const cap = extintorReady ? 100 : 99;
-        const rounded = Math.min(cap, Math.round(progressState.val));
-        if (loadingPercent) loadingPercent.textContent = rounded;
-      },
-      onComplete: () => {
-        tweenFinished = true;
-        tryReleasePreloader();
-      }
-    });
-
     priorityIndices.forEach(idx => {
+      if (idx === 0) return;
       const img = new Image();
       img.decoding = 'async';
       img.onload = () => {
         priorityLoaded++;
-        const targetPct = Math.min(98, Math.round((priorityLoaded / totalPriority) * 98));
-        if (targetPct > progressState.val) {
-          gsap.to(progressState, {
-            val: targetPct,
-            duration: 0.2,
-            ease: 'power1.out'
-          });
-        }
-        if (priorityLoaded === 1) {
-          drawFrame(0);
-        }
+        images[idx] = img;
       };
       img.onerror = () => {
         priorityLoaded++;
       };
       img.src = getFrameUrl(idx);
-      images[idx] = img;
     });
 
-    // Safety fallback (4.8s)
-    const safetyTimeout = 4800;
+    // Contador visual dinâmico (0% a 100% em ~0.85s)
+    const progressTween = gsap.to(progressState, {
+      val: 100,
+      duration: loadDuration,
+      ease: 'power2.out',
+      onUpdate: () => {
+        const rounded = Math.round(progressState.val);
+        if (loadingPercent) loadingPercent.textContent = rounded;
+      },
+      onComplete: () => {
+        if (!screenReleased) {
+          finishPreload();
+          streamRemainingFrames();
+        }
+      }
+    });
+
+    // Fallback de segurança ultra-rápido (máximo 1.2s sob qualquer conexão)
     setTimeout(() => {
       if (!screenReleased) {
-        extintorReady = true;
-        tweenFinished = true;
         progressTween.progress(1);
         finishPreload();
         streamRemainingFrames();
       }
-    }, safetyTimeout);
+    }, 1200);
   }
 
   // Transmissão inteligente em lotes dos frames restantes respeitando o frameStride
@@ -433,18 +408,18 @@
     // Step 1: Fade out technical typography and central logo
     gsap.to(['.loading-content', '.loading-logo-wrap'], {
       opacity: 0,
-      duration: 0.3,
+      duration: 0.2,
       ease: 'power2.out'
     });
 
     // Step 2: Camera push-in on hero to create cinematic visual emergence as curtains part
     gsap.fromTo('.hero-video-wrap', 
-      { scale: 1.05 }, 
-      { scale: 1, duration: 1.1, ease: 'power2.out' }
+      { scale: 1.04 }, 
+      { scale: 1, duration: 0.75, ease: 'power2.out' }
     );
     gsap.fromTo('.hero-big-wrap', 
-      { opacity: 0.6, y: 15 }, 
-      { opacity: 1, y: 0, duration: 0.85, ease: 'power2.out', delay: 0.1 }
+      { opacity: 0.6, y: 12 }, 
+      { opacity: 1, y: 0, duration: 0.65, ease: 'power2.out', delay: 0.05 }
     );
 
     // Step 3: Split aperture opening - reveals the hero in real-time as curtains part
@@ -453,7 +428,7 @@
     gsap.to(apertureState, {
       top: 0,
       bot: 100,
-      duration: 0.95,
+      duration: 0.60,
       ease: 'cubic-bezier(0.77, 0, 0.175, 1)',
       onUpdate: () => {
         if (loadingMain) {
