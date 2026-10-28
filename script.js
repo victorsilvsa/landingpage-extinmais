@@ -279,14 +279,14 @@
 
     if (loadingLogoBrand) gsap.set(loadingLogoBrand, { opacity: 0, scale: 0.92 });
 
-    // Animação acelerada e dinâmica dos traços técnicos (~0.65s)
+    // Animação cadenciada e elegante dos traços técnicos do blueprint (~1.8s)
     if (svgPaths.length > 0) {
       gsap.to(svgPaths, {
         strokeDashoffset: 0,
-        duration: 0.65,
-        stagger: { amount: 0.35, from: 'start' },
+        duration: 1.1,
+        stagger: { amount: 0.9, from: 'start' },
         ease: 'power2.out',
-        delay: 0.05
+        delay: 0.1
       });
     }
 
@@ -294,9 +294,9 @@
       gsap.to(loadingLogoBrand, {
         opacity: 1,
         scale: 1,
-        duration: 0.45,
+        duration: 0.8,
         ease: 'power2.out',
-        delay: 0.15
+        delay: 0.45
       });
     }
   }
@@ -305,7 +305,7 @@
     initHeronPreloader();
 
     const progressState = { val: 0 };
-    const loadDuration = 0.85; // Entrada veloz e ultra-fluida (< 1 segundo)
+    const loadDuration = 2.1; // Ritmo equilibrado e cinematográfico (~2 segundos)
 
     // Renderiza o frame inicial imediatamente para desenhar no canvas sem tela branca
     const firstImg = new Image();
@@ -333,11 +333,11 @@
       img.src = getFrameUrl(idx);
     });
 
-    // Contador visual dinâmico (0% a 100% em ~0.85s)
+    // Contador visual progressivo e suave (0% a 100% em ~2.1s)
     const progressTween = gsap.to(progressState, {
       val: 100,
       duration: loadDuration,
-      ease: 'power2.out',
+      ease: 'power1.inOut',
       onUpdate: () => {
         const rounded = Math.round(progressState.val);
         if (loadingPercent) loadingPercent.textContent = rounded;
@@ -350,14 +350,14 @@
       }
     });
 
-    // Fallback de segurança ultra-rápido (máximo 1.2s sob qualquer conexão)
+    // Fallback de segurança (máximo 2.6s)
     setTimeout(() => {
       if (!screenReleased) {
         progressTween.progress(1);
         finishPreload();
         streamRemainingFrames();
       }
-    }, 1200);
+    }, 2600);
   }
 
   // Transmissão inteligente em lotes dos frames restantes respeitando o frameStride
@@ -411,18 +411,18 @@
     // Step 1: Fade out technical typography and central logo
     gsap.to(['.loading-content', '.loading-logo-wrap'], {
       opacity: 0,
-      duration: 0.2,
+      duration: 0.28,
       ease: 'power2.out'
     });
 
     // Step 2: Camera push-in on hero to create cinematic visual emergence as curtains part
     gsap.fromTo('.hero-video-wrap', 
-      { scale: 1.04 }, 
-      { scale: 1, duration: 0.75, ease: 'power2.out' }
+      { scale: 1.05 }, 
+      { scale: 1, duration: 0.95, ease: 'power2.out' }
     );
     gsap.fromTo('.hero-big-wrap', 
-      { opacity: 0.6, y: 12 }, 
-      { opacity: 1, y: 0, duration: 0.65, ease: 'power2.out', delay: 0.05 }
+      { opacity: 0.6, y: 15 }, 
+      { opacity: 1, y: 0, duration: 0.80, ease: 'power2.out', delay: 0.08 }
     );
 
     // Step 3: Split aperture opening - reveals the hero in real-time as curtains part
@@ -431,7 +431,7 @@
     gsap.to(apertureState, {
       top: 0,
       bot: 100,
-      duration: 0.60,
+      duration: 0.75,
       ease: 'cubic-bezier(0.77, 0, 0.175, 1)',
       onUpdate: () => {
         if (loadingMain) {
