@@ -1,8 +1,17 @@
 /* ==========================================================================
-   EXTINMAIS — MAIN SCRIPT (Alta Performance, Mobile Fluido & Sem Bugs de Scroll)
+   EXTINMAIS — MAIN SCRIPT (Alta Performance, Mobile Fluido & Rolagem Nativa)
    ========================================================================== */
 (function () {
   'use strict';
+
+  // F5 Reload — Garantir restauração manual e reinício sempre no topo
+  if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+  }
+  window.scrollTo(0, 0);
+  window.addEventListener('beforeunload', () => {
+    window.scrollTo(0, 0);
+  });
 
   // Configuração global do GSAP e ScrollTrigger contra quebras no mobile
   gsap.registerPlugin(ScrollTrigger);
@@ -67,9 +76,6 @@
   }
 
   // Configuração adaptativa de amostragem de frames e DPR
-  // Ultra fraco: carrega 60 frames (1 a cada 4) => economiza 75% de RAM e previne crash OOM!
-  // Moderado: carrega 120 frames (1 a cada 2) => economiza 50% de RAM!
-  // Alto desempenho: carrega todos os 240 frames
   const frameStride = hardwareProfile.isUltraLowEnd ? 4 : (hardwareProfile.isLowEnd ? 2 : 1);
   const totalFrames = 240;
   const framePrefix = 'ezgif-frame-';
@@ -87,32 +93,20 @@
   )).sort((a, b) => a - b);
 
   /* ------------------------------------------------------------------------
-     1. SMOOTH SCROLL (Lenis no Desktop Potente & Touch Nativo Fluido no Mobile / Low-End)
+     1. SCROLL CONTROLLER & CACHED METRICS (Zero Forced Reflow)
      ------------------------------------------------------------------------ */
-  let lenis = null;
-  if (!isTouchDevice && !hardwareProfile.isLowEnd && !hardwareProfile.isUltraLowEnd && typeof Lenis !== 'undefined') {
-    lenis = new Lenis({
-      duration: 1.15,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      smoothWheel: true,
-      wheelMultiplier: 0.9,
-      infinite: false
-    });
+  let cachedWinH = window.innerHeight;
+  let cachedHeroPinDist = cachedWinH * (isMobileSize ? 1.8 : 2.4);
+  let cachedMaxScrollAfterHero = 3000;
 
-    lenis.on('scroll', () => {
-      ScrollTrigger.update();
-      updateCanvasFrameTarget();
-    });
-
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
-  } else {
-    // Touchscreen / Mobile / Ultra Low-End: rolagem nativa a 60-120Hz no compositor do navegador
-    window.addEventListener('scroll', () => {
-      ScrollTrigger.update();
-      updateCanvasFrameTarget();
-    }, { passive: true });
+  function updateCachedScrollMetrics() {
+    cachedWinH = window.innerHeight;
+    cachedHeroPinDist = cachedWinH * (isMobileSize ? 1.8 : 2.4);
+    const docH = Math.max(
+      document.body ? document.body.scrollHeight : 0,
+      document.documentElement ? document.documentElement.scrollHeight : 0
+    );
+    cachedMaxScrollAfterHero = Math.max(1, docH - cachedWinH - cachedHeroPinDist);
   }
 
   // Previne saltos e acúmulo de processamento no ticker em aparelhos fracos
@@ -134,12 +128,12 @@
   function resizeCanvas() {
     if (!canvas || !ctx) return;
     
-    // DPR adaptativo: 1.0 para aparelhos fracos (economiza 75% de fill-rate), até 2.0 para telas Retina
+    // DPR adaptativo: 1.0 para aparelhos fracos (economiza 75% de fill-rate), até 1.75 para telas Retina
     let dpr = 1.0;
     if (!hardwareProfile.isUltraLowEnd) {
       dpr = hardwareProfile.isLowEnd 
-        ? Math.min(window.devicePixelRatio || 1, 1.25)
-        : Math.min(window.devicePixelRatio || 1, 2.0);
+        ? Math.min(window.devicePixelRatio || 1, 1.2)
+        : Math.min(window.devicePixelRatio || 1, 1.75);
     }
 
     const w = window.innerWidth;
@@ -149,7 +143,7 @@
     canvas.height = Math.round(h * dpr);
 
     ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = hardwareProfile.isUltraLowEnd ? 'low' : (hardwareProfile.isLowEnd ? 'medium' : 'high');
+    ctx.imageSmoothingQuality = hardwareProfile.isUltraLowEnd ? 'low' : 'medium';
 
     drawFrame(Math.round(frameState.current));
   }
@@ -162,7 +156,6 @@
 
     let img = images[sampledIndex];
     if (!img || !img.complete || !img.naturalWidth) {
-      // Busca inteligente do frame renderizável mais próximo dentro da grade amostrada
       for (let offset = frameStride; offset <= 30 * frameStride; offset += frameStride) {
         const prev = images[sampledIndex - offset];
         if (prev && prev.complete && prev.naturalWidth) {
@@ -210,10 +203,7 @@
   function updateCanvasFrameTarget() {
     const scrollY = window.scrollY;
     
-    // Altura do pin do hero onde a cortina opera (o fundo permanece estático até a cortina terminar)
-    const heroPinDistance = window.innerHeight * (isMobileSize ? 1.8 : 2.5);
-    
-    if (scrollY <= heroPinDistance) {
+    if (scrollY <= cachedHeroPinDist) {
       if (targetFrame !== 0) {
         targetFrame = 0;
         requestCanvasUpdate();
@@ -221,14 +211,11 @@
       return;
     }
 
-    const scrollAfterHero = scrollY - heroPinDistance;
-    const maxScrollAfterHero = document.documentElement.scrollHeight - window.innerHeight - heroPinDistance;
-    if (maxScrollAfterHero <= 0) return;
-
-    const progress = Math.max(0, Math.min(1, scrollAfterHero / maxScrollAfterHero));
+    const scrollAfterHero = scrollY - cachedHeroPinDist;
+    const progress = Math.max(0, Math.min(1, scrollAfterHero / cachedMaxScrollAfterHero));
     const newTarget = progress * (totalFrames - 1);
     
-    if (Math.abs(newTarget - targetFrame) > 0.05) {
+    if (Math.abs(newTarget - targetFrame) > 0.15) {
       targetFrame = newTarget;
       requestCanvasUpdate();
     }
@@ -275,14 +262,6 @@
   }
 
   function initHeronPreloader() {
-    if (hardwareProfile.isUltraLowEnd) {
-      // Dispositivos ultra-fracos: liberação instantânea sem travar a CPU calculando vetores SVG
-      if (loadingLogoBrand) {
-        gsap.to(loadingLogoBrand, { opacity: 1, scale: 1, duration: 0.35, ease: 'power2.out' });
-      }
-      gsap.to('.loading-content-sub-item-txt', { opacity: 1, y: 0, duration: 0.2, stagger: 0.02 });
-      return;
-    }
 
     // Prepare Blueprint SVG paths with exact stroke-dasharray
     const blueprintSvg = document.querySelector('.loading-blueprint-svg');
@@ -295,16 +274,14 @@
       gsap.set(el, { strokeDasharray: len, strokeDashoffset: len });
     });
 
-    // Set initial states
-    gsap.set('.loading-content-sub-item-txt', { opacity: 0, y: 6 });
     if (loadingLogoBrand) gsap.set(loadingLogoBrand, { opacity: 0, scale: 0.92 });
 
     // Animate blueprint vector drawing
     if (svgPaths.length > 0) {
       gsap.to(svgPaths, {
         strokeDashoffset: 0,
-        duration: 1.4,
-        stagger: { amount: 1.8, from: 'start' },
+        duration: 1.2,
+        stagger: { amount: 1.4, from: 'start' },
         ease: 'power2.out',
         delay: 0.1
       });
@@ -319,16 +296,6 @@
         delay: 0.4
       });
     }
-
-    // Animate technical telemetry text stagger
-    gsap.to('.loading-content-sub-item-txt', {
-      opacity: 1,
-      y: 0,
-      duration: 0.28,
-      stagger: 0.08,
-      ease: 'power2.out',
-      delay: 0.3
-    });
   }
 
   function loadAssets() {
@@ -337,7 +304,30 @@
     let priorityLoaded = 0;
     const totalPriority = priorityIndices.length;
     const progressState = { val: 0 };
-    const loadDuration = hardwareProfile.isUltraLowEnd ? 0.7 : (hardwareProfile.isLowEnd ? 1.4 : 2.2);
+    const loadDuration = 2.6;
+
+    // Garante que o modelo 3D do Extintor seja carregado antes do término do Preloader
+    const mv = document.getElementById('extintorModel');
+    let extintorReady = !mv || Boolean(mv.loaded);
+    let tweenFinished = false;
+
+    function tryReleasePreloader() {
+      if (tweenFinished && extintorReady && !screenReleased) {
+        finishPreload();
+        streamRemainingFrames();
+      }
+    }
+
+    if (mv && !extintorReady) {
+      mv.addEventListener('load', () => {
+        extintorReady = true;
+        tryReleasePreloader();
+      }, { once: true });
+      mv.addEventListener('error', () => {
+        extintorReady = true;
+        tryReleasePreloader();
+      }, { once: true });
+    }
 
     // Smooth counter animation interpolating between real load events and GSAP timeline
     const progressTween = gsap.to(progressState, {
@@ -345,14 +335,13 @@
       duration: loadDuration,
       ease: 'power2.out',
       onUpdate: () => {
-        const rounded = Math.round(progressState.val);
+        const cap = extintorReady ? 100 : 99;
+        const rounded = Math.min(cap, Math.round(progressState.val));
         if (loadingPercent) loadingPercent.textContent = rounded;
       },
       onComplete: () => {
-        if (!screenReleased) {
-          finishPreload();
-          streamRemainingFrames();
-        }
+        tweenFinished = true;
+        tryReleasePreloader();
       }
     });
 
@@ -361,7 +350,7 @@
       img.decoding = 'async';
       img.onload = () => {
         priorityLoaded++;
-        const targetPct = Math.min(100, Math.round((priorityLoaded / totalPriority) * 100));
+        const targetPct = Math.min(98, Math.round((priorityLoaded / totalPriority) * 98));
         if (targetPct > progressState.val) {
           gsap.to(progressState, {
             val: targetPct,
@@ -380,10 +369,12 @@
       images[idx] = img;
     });
 
-    // Safety fallback
-    const safetyTimeout = hardwareProfile.isUltraLowEnd ? 1200 : 2800;
+    // Safety fallback (4.8s)
+    const safetyTimeout = 4800;
     setTimeout(() => {
       if (!screenReleased) {
+        extintorReady = true;
+        tweenFinished = true;
         progressTween.progress(1);
         finishPreload();
         streamRemainingFrames();
@@ -481,6 +472,7 @@
           }
         }
         document.body.style.overflow = '';
+        window.scrollTo(0, 0);
         initScrollAnimations();
       }
     });
@@ -492,37 +484,11 @@
   function initScrollAnimations() {
     isMobileSize = checkMobile();
     resizeCanvas();
+    updateCachedScrollMetrics();
     updateCanvasFrameTarget();
     requestCanvasUpdate();
 
-    // Leve paralaxe no canvas (apenas em dispositivos capazes para evitar repaints de tela inteira)
-    if (!hardwareProfile.isUltraLowEnd) {
-      gsap.to('#bg-canvas', {
-        yPercent: isMobileSize ? 2 : 4,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: 'body',
-          start: 'top top',
-          end: 'bottom bottom',
-          scrub: true
-        }
-      });
-    }
-
-    // Elementos com atributo data-parallax
-    gsap.utils.toArray('[data-parallax]').forEach(el => {
-      const depth = parseFloat(el.getAttribute('data-parallax')) || 8;
-      gsap.to(el, {
-        yPercent: isMobileSize ? depth * 0.35 : depth,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: el,
-          start: 'top bottom',
-          end: 'bottom top',
-          scrub: hardwareProfile.isUltraLowEnd ? 0.2 : true
-        }
-      });
-    });
+    ScrollTrigger.addEventListener('refresh', updateCachedScrollMetrics);
 
     initHeroCurtainTransition();
     initSobreWordByWordReveal();
@@ -538,11 +504,12 @@
 
     requestAnimationFrame(() => {
       ScrollTrigger.refresh();
+      updateCachedScrollMetrics();
     });
   }
 
   /* ------------------------------------------------------------------------
-     4.1 CORTINA DE TRANSIÇÃO (Ágil, sem tela preta travada)
+     4.1 CORTINA DE TRANSIÇÃO (Transição Bidirecional Fluida e Simétrica)
      ------------------------------------------------------------------------ */
   function initHeroCurtainTransition() {
     const hero = document.querySelector('.hero');
@@ -560,11 +527,11 @@
     gsap.set(steps, { scaleY: 0, transformOrigin: 'top center' });
     gsap.set(transitionText, { opacity: 0, y: 0 });
     if (pill) gsap.set(pill, { opacity: 0, y: 15 });
-    if (title) gsap.set(title, { opacity: 0, y: 22 });
+    if (title) gsap.set(title, { opacity: 0, y: 20 });
     if (sub) gsap.set(sub, { opacity: 0, y: 15 });
     
     if (heroVideoWrap) {
-      gsap.set(heroVideoWrap, { visibility: 'visible', opacity: 1 });
+      gsap.set(heroVideoWrap, { opacity: 1 });
     }
 
     const tl = gsap.timeline();
@@ -572,73 +539,67 @@
     // 1. Textos e indicadores do hero desaparecem suavemente
     tl.to('.hero-big-wrap, .scroll-indicator', {
       opacity: 0,
-      y: -30,
-      duration: 0.5,
+      y: -25,
+      duration: 0.45,
       ease: 'power1.out'
     }, 0)
-    // 2. Os degraus descem cobrindo COMPLETAMENTE o hero (.hero-video-wrap permanece VISÍVEL por baixo!)
+    // 2. Os degraus descem cobrindo COMPLETAMENTE o hero de cima para baixo
     .to(steps, {
       scaleY: 1,
-      stagger: 0.045,
+      stagger: 0.035,
       ease: 'power2.inOut',
-      duration: 1.1
-    }, 0)
-    // 3. SOMENTE quando os degraus cobrirem 100% da tela (tela totalmente preta), escondemos o hero
-    .set('.hero-video-wrap', { visibility: 'hidden' }, 1.2)
+      duration: 1.0,
+      transformOrigin: 'top center'
+    }, 0.1)
+    // 3. Suavização da visibilidade do hero sob a cortina
+    .to(heroVideoWrap, { opacity: 0, duration: 0.35, ease: 'none' }, 0.85)
     // 4. Revela o bloco editorial de transição sobre o fundo preto da cortina
-    .set(transitionText, { opacity: 1 }, 1.25)
+    .to(transitionText, { opacity: 1, duration: 0.25 }, 1.0)
     .to(pill, {
+      opacity: 1,
+      y: 0,
+      duration: 0.4,
+      ease: 'power2.out'
+    }, 1.05)
+    .to(title, {
+      opacity: 1,
+      y: 0,
+      duration: 0.5,
+      ease: 'power2.out'
+    }, 1.15)
+    .to(sub, {
       opacity: 1,
       y: 0,
       duration: 0.45,
       ease: 'power2.out'
-    }, 1.3)
-    .to(title, {
-      opacity: 1,
-      y: 0,
-      duration: 0.65,
-      ease: 'power2.out'
-    }, 1.45)
-    .to(sub, {
-      opacity: 1,
-      y: 0,
-      duration: 0.55,
-      ease: 'power2.out'
-    }, 1.65)
-    // Pausa confortável e estável para leitura (hold window)
-    .to({}, { duration: 1.1 })
+    }, 1.25)
+    // Pausa confortável e estável para leitura
+    .to({}, { duration: 0.9 })
     // Fade out suave do texto
     .to(transitionText, {
       opacity: 0,
-      y: -24,
-      duration: 0.4,
+      y: -18,
+      duration: 0.35,
       ease: 'power2.in'
     })
-    // 5. A cortina abre de baixo para cima, e SOMENTE AGORA a seção #sobre e o fundo do canvas aparecem!
+    // 5. A cortina abre suavemente em direção ao fundo
     .to(steps, {
-      scaleY: 0,
-      stagger: 0.035,
+      yPercent: 100,
+      stagger: 0.03,
       ease: 'power2.inOut',
-      duration: 1.0,
-      transformOrigin: 'bottom center'
+      duration: 0.95
     });
 
     ScrollTrigger.create({
       trigger: hero,
       start: 'top top',
-      end: () => isMobileSize ? '+=180%' : '+=250%',
+      end: () => isMobileSize ? '+=180%' : '+=240%',
       pin: true,
       pinSpacing: true,
-      scrub: isMobileSize ? 0.6 : 1.0,
+      scrub: 0.6,
       invalidateOnRefresh: true,
       anticipatePin: 1,
-      animation: tl,
-      onLeave: () => {
-        if (heroVideoWrap) gsap.set(heroVideoWrap, { visibility: 'hidden' });
-      },
-      onEnterBack: () => {
-        if (heroVideoWrap) gsap.set(heroVideoWrap, { visibility: 'visible', opacity: 1 });
-      }
+      animation: tl
     });
   }
 
@@ -657,14 +618,14 @@
       const wordSpan = document.createElement('span');
       wordSpan.className = 'word-reveal';
       wordSpan.style.display = 'inline-block';
-      wordSpan.style.opacity = '0.45';
+      wordSpan.style.opacity = '0.38';
+      wordSpan.style.color = '#FAF4EB';
       wordSpan.innerHTML = word + '&nbsp;';
       textEl.appendChild(wordSpan);
     });
 
     gsap.to('.word-reveal', {
       opacity: 1,
-      color: '#FAF4EB',
       stagger: 0.02,
       ease: 'power1.out',
       scrollTrigger: {
@@ -703,10 +664,9 @@
     // Entrada elegante do badge de telemetria CAD
     if (badgeEl) {
       gsap.fromTo(badgeEl,
-        { y: 20, opacity: 0 },
+        { y: 20 },
         {
           y: 0,
-          opacity: 1,
           duration: 0.8,
           ease: 'power3.out',
           scrollTrigger: {
@@ -780,32 +740,32 @@
 
     const isMobile = window.innerWidth <= 940;
 
-    // Geometria da Roda Radial Buck's Sauce
-    // Desktop: Raio de 2000px, arco amplo | Mobile: Raio de 950px adaptado à largura da tela
-    const R = isMobile ? 950 : 2000;
-    const stepAngle = isMobile ? 26 : 22; // Espaçamento angular entre cada card (em graus)
+    // Geometria da Roda Radial Buck's Sauce — Cards rodam no meio da tela sem subir para o título
+    const R = isMobile ? 950 : 1850;
+    const stepAngle = isMobile ? 28 : 24;
 
     function applyWheelTransform(angle) {
       cards.forEach((card, i) => {
         const cardAngle = angle + (i * stepAngle);
+        const absAngle = Math.abs(cardAngle);
         const rad = (cardAngle * Math.PI) / 180;
         const x = R * Math.sin(rad);
-        const y = R * (1 - Math.cos(rad));
-        const rot = cardAngle * (isMobile ? 0.75 : 1.0);
-        const absAngle = Math.abs(cardAngle);
+        // Curva descendente reforçada nas laterais para que os cards ao girar NUNCA subam em cima do título
+        const y = R * (1 - Math.cos(rad)) + Math.pow(absAngle / stepAngle, 1.35) * (isMobile ? 28 : 44);
+        const rot = cardAngle * (isMobile ? 0.35 : 0.45);
 
         let opacity = 0;
         let scale = 1;
-        if (absAngle < 8) {
+        if (absAngle < 5) {
           opacity = 1;
           scale = 1;
-        } else if (absAngle < 30) {
-          const factor = (absAngle - 8) / 22;
-          opacity = 1 - (factor * 0.65);
+        } else if (absAngle < stepAngle * 0.85) {
+          const factor = (absAngle - 5) / (stepAngle * 0.85 - 5);
+          opacity = 1 - (factor * 0.85);
           scale = 1 - (factor * 0.12);
-        } else if (absAngle < 55) {
-          const factor = (absAngle - 30) / 25;
-          opacity = 0.35 * (1 - factor);
+        } else if (absAngle < stepAngle * 1.25) {
+          const factor = (absAngle - stepAngle * 0.85) / (stepAngle * 0.4);
+          opacity = 0.15 * (1 - factor);
           scale = 0.88 - (factor * 0.08);
         } else {
           opacity = 0;
@@ -815,62 +775,48 @@
         card.style.transform = `translate3d(${x.toFixed(2)}px, ${y.toFixed(2)}px, 0) rotate(${rot.toFixed(2)}deg) scale(${scale.toFixed(3)})`;
         card.style.opacity = opacity.toFixed(3);
         card.style.zIndex = zIndex;
-        card.style.pointerEvents = absAngle < 14 ? 'auto' : 'none';
+        card.style.pointerEvents = absAngle < 10 ? 'auto' : 'none';
       });
 
-      // Inclinação dinâmica dos dígitos para expressividade tipográfica (apenas dispositivos capazes)
       if (!hardwareProfile.isUltraLowEnd) {
         digits.forEach((digit, dIdx) => {
-          const dRot = (dIdx % 2 === 0 ? 4 : -4) * Math.sin((angle * Math.PI) / 180);
+          const dRot = (dIdx % 2 === 0 ? 2 : -2) * Math.sin((angle * Math.PI) / 180);
           digit.style.transform = `rotate(${dRot.toFixed(2)}deg)`;
         });
       }
     }
 
-    // Inicialização imediata: Card 01 centralizado no topo do arco (0 deg)
+    // Inicialização imediata: Card 01 centralizado no meio da tela (0 deg)
     applyWheelTransform(0);
 
     const wheelState = { angle: 0 };
+    const totalAngle = -stepAngle * (cards.length - 1);
 
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
-        start: "top top",
+        start: "center center",
         end: () => isMobile ? "+=260%" : "+=320%",
         pin: true,
-        scrub: hardwareProfile.isUltraLowEnd ? 0.35 : 0.8,
+        scrub: 0.6,
         anticipatePin: 1,
         invalidateOnRefresh: true
       }
     });
 
-    // Animação com paradas confortáveis em cada card e retenção do Card 04 no final
-    tl.to({}, { duration: 0.15 }) // Pausa inicial no Card 01 (perfeitamente centralizado)
+    // Pausa inicial quando a seção trava no meio da tela antes de iniciar o giro dos cards
+    tl.to({}, { duration: 0.45 })
       .to(wheelState, {
-        angle: -stepAngle,
-        duration: 1.0,
-        ease: "power2.inOut",
+        angle: totalAngle,
+        duration: 3.0,
+        ease: "none",
         onUpdate: () => applyWheelTransform(wheelState.angle)
       })
-      .to({}, { duration: 0.25 }) // Pausa no Card 02 (centralizado)
-      .to(wheelState, {
-        angle: -stepAngle * 2,
-        duration: 1.0,
-        ease: "power2.inOut",
-        onUpdate: () => applyWheelTransform(wheelState.angle)
-      })
-      .to({}, { duration: 0.25 }) // Pausa no Card 03 (centralizado)
-      .to(wheelState, {
-        angle: -stepAngle * 3,
-        duration: 1.0,
-        ease: "power2.inOut",
-        onUpdate: () => applyWheelTransform(wheelState.angle)
-      })
-      .to({}, { duration: 0.35 }); // Pausa final no Card 04 (permanece centralizado antes do unpin)
+      .to({}, { duration: 0.45 });
   }
 
   /* ------------------------------------------------------------------------
-     7.1 EXTINTOR 3D & REVELAÇÃO DO FOOTER (COBERTURA TOTAL DA TELA)
+     7.1 EXTINTOR 3D & REVELAÇÃO DO FOOTER (IMPACTO REAL NA TELA SEM CÍRCULO)
      ------------------------------------------------------------------------ */
   function initCtaFooterTransition() {
     const group = document.getElementById('ctaFooterGroup');
@@ -878,111 +824,111 @@
     const footer = document.getElementById('contato');
     const mv = document.getElementById('extintorModel');
     const stage = document.getElementById('ctaExtintorStage');
-    const indicator = document.getElementById('footerIndicator');
-    const veil = document.getElementById('extintorCoverVeil');
+    const halo = document.getElementById('extintorHalo');
 
     if (!group || !ctaSection || !footer) return;
 
     const isMobile = window.innerWidth <= 940;
 
-    // Configuração de fidelidade 3D adaptativa para não sobrecarregar GPUs fracas
-    if (mv && hardwareProfile.isUltraLowEnd) {
-      try {
-        mv.setAttribute('render-scale', '0.65');
-        mv.setAttribute('power-preference', 'low-power');
-      } catch (e) {}
+    // Inicialização: Footer 100% invisível até o extintor preencher toda a tela
+    gsap.set(footer, { opacity: 0, pointerEvents: 'none', visibility: 'hidden' });
+
+    const initialOrbitRadius = isMobile ? 350 : 320;
+    const initialFov = isMobile ? 50 : 46;
+    const restingY = isMobile ? 28 : 34;
+
+    let cameraState = {
+      theta: 0,
+      radius: initialOrbitRadius,
+      fov: initialFov
+    };
+
+    if (mv) {
+      mv.cameraOrbit = `0deg 84deg ${initialOrbitRadius}%`;
+      mv.fieldOfView = `${initialFov}deg`;
+      mv.cameraTarget = `0m 0m 0m`;
     }
 
-    // Inicialização: Footer 100% invisível até cobertura total
-    gsap.set(footer, { opacity: 0, pointerEvents: 'none', visibility: 'hidden' });
-    if (veil) gsap.set(veil, { opacity: 0, scale: 0.08 });
+    if (stage) {
+      gsap.set(stage, { y: restingY, scale: 1, opacity: 1 });
+    }
 
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: group,
         start: "top top",
-        end: () => isMobile ? "+=180%" : "+=220%",
+        end: () => isMobile ? "+=190%" : "+=230%",
         pin: true,
-        scrub: isMobile ? 0.7 : 1,
+        scrub: isMobile ? 0.55 : 0.85,
         anticipatePin: 1,
         invalidateOnRefresh: true
       }
     });
 
-    const initialOrbitRadius = isMobile ? 230 : 200;
-    const initialTargetY = isMobile ? 0.05 : 0.10;
-    const initialFov = isMobile ? 54 : 48;
-    const targetRadius = isMobile ? 12 : 16;
-    const targetFov = isMobile ? 9 : 11;
-    let cameraState = { 
-      theta: 8, 
-      radius: initialOrbitRadius, 
-      fov: initialFov,
-      targetY: initialTargetY 
-    };
-
-    // 1. Textos e indicadores do CTA esmaecem
-    tl.to('.cta-content-top, .cta-content-bottom', {
+    // 1. Textos superiores e botão inferior saem suavemente
+    tl.to('.cta-content-top', {
       opacity: 0,
-      y: -30,
-      duration: 0.2,
+      y: -24,
+      duration: 0.20,
+      ease: "power2.out"
+    }, 0)
+    .to('.cta-content-bottom', {
+      opacity: 0,
+      y: 24,
+      duration: 0.20,
       ease: "power2.out"
     }, 0);
 
-    if (indicator) {
-      tl.to(indicator, { opacity: 0, duration: 0.15 }, 0);
+    if (halo) {
+      tl.to(halo, {
+        opacity: 0,
+        duration: 0.25,
+        ease: "power1.out"
+      }, 0.05);
     }
 
-    // 2. Extintor 3D aproxima e expande para COBERTURA TOTAL da tela (sem cortes em div)
+    // 2. O Extintor 3D aproxima de verdade até bater/preencher 100% da tela (sem círculo vermelho)
     if (mv) {
       tl.to(cameraState, {
-        theta: 270,
-        radius: targetRadius,
-        fov: targetFov,
-        targetY: 0,
-        duration: 0.75,
-        ease: "power2.inOut",
+        theta: 180,
+        radius: 5,
+        fov: 2,
+        duration: 0.76,
+        ease: "power2.in",
         onUpdate: () => {
-          if (mv.cameraOrbit) {
-            mv.cameraOrbit = `${cameraState.theta.toFixed(1)}deg 82deg ${cameraState.radius.toFixed(1)}%`;
-            mv.fieldOfView = `${cameraState.fov.toFixed(1)}deg`;
-            mv.cameraTarget = `0m ${cameraState.targetY.toFixed(2)}m 0m`;
-          }
+          mv.cameraOrbit = `${cameraState.theta.toFixed(1)}deg 84deg ${cameraState.radius.toFixed(1)}%`;
+          mv.fieldOfView = `${cameraState.fov.toFixed(1)}deg`;
         }
-      }, 0.05);
-
-      if (veil) {
-        tl.to(veil, {
-          opacity: 1,
-          scale: 1.0,
-          duration: 0.45,
-          ease: "power1.in"
-        }, 0.35);
-      }
-
-      // 3. Extintor dissolve suavemente no ápice da cobertura para o Footer
-      if (stage) {
-        tl.to(stage, {
-          opacity: 0,
-          duration: 0.12,
-          ease: "power1.in"
-        }, 0.78);
-      }
+      }, 0.02);
     }
 
-    // 4. Revelação do Footer 100% completo, opaco e interativo
-    tl.set(footer, { visibility: 'visible' }, 0.80)
-      .to(footer, {
-        opacity: 1,
-        pointerEvents: 'auto',
-        duration: 0.2,
-        ease: "power2.out"
-      }, 0.82)
-      .fromTo('.footer-brand, .footer-col, .footer-mobile-wa-bar', 
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, stagger: 0.03, duration: 0.18, ease: "power2.out" },
-        0.84
-      );
+    if (stage) {
+      tl.to(stage, {
+        y: 0,
+        scale: isMobile ? 4.8 : 5.8,
+        duration: 0.76,
+        ease: "power2.in"
+      }, 0.02);
+
+      // 3. No exato momento em que o extintor preenche a tela inteira, dissolve para revelar o Footer
+      tl.to(stage, {
+        opacity: 0,
+        duration: 0.16,
+        ease: "power1.inOut"
+      }, 0.78);
+    }
+
+    // 4. Revelação suave do Footer (bidirecional)
+    tl.fromTo(footer, 
+      { opacity: 0, visibility: 'hidden', pointerEvents: 'none' },
+      { opacity: 1, visibility: 'visible', pointerEvents: 'auto', duration: 0.20, ease: "power2.out" },
+      0.78
+    )
+    .fromTo('.footer-brand, .footer-col, .footer-mobile-wa-bar', 
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, stagger: 0.03, duration: 0.18, ease: "power2.out" },
+      0.80
+    );
   }
 
   /* ------------------------------------------------------------------------
@@ -1076,12 +1022,8 @@
           document.body.style.overflow = '';
         }
 
-        if (lenis) {
-          lenis.scrollTo(target, { offset: -70, duration: 1.15 });
-        } else {
-          const top = target.getBoundingClientRect().top + window.scrollY - 70;
-          window.scrollTo({ top, behavior: 'smooth' });
-        }
+        const top = target.getBoundingClientRect().top + window.scrollY - 70;
+        window.scrollTo({ top, behavior: 'smooth' });
       }
     });
   });
@@ -1112,11 +1054,7 @@
 
   if (backToTop) {
     backToTop.addEventListener('click', () => {
-      if (lenis) {
-        lenis.scrollTo(0, { duration: 1.1 });
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
   }
 
@@ -1135,13 +1073,14 @@
   }
 
   /* ------------------------------------------------------------------------
-     12. EVENTOS PASSIVOS DE SCROLL & RESIZE
+     12. EVENTOS PASSIVOS UNIFICADOS DE SCROLL & RESIZE (Zero Forced Reflow)
      ------------------------------------------------------------------------ */
   let scrollPending = false;
   window.addEventListener('scroll', () => {
     if (scrollPending) return;
     scrollPending = true;
     requestAnimationFrame(() => {
+      updateCanvasFrameTarget();
       handleHeaderScroll();
       handleBackToTop();
       scrollPending = false;
@@ -1149,13 +1088,20 @@
   }, { passive: true });
 
   let resizeTimeout;
+  let lastWinWidth = window.innerWidth;
   window.addEventListener('resize', () => {
     clearTimeout(resizeTimeout);
     resizeTimeout = setTimeout(() => {
-      isMobileSize = checkMobile();
-      resizeCanvas();
-      ScrollTrigger.refresh();
-    }, 180);
+      const currentWidth = window.innerWidth;
+      // Ignora variações apenas de barra de endereço no mobile para evitar recalcular pins pesados durante o scroll
+      if (Math.abs(currentWidth - lastWinWidth) > 2) {
+        lastWinWidth = currentWidth;
+        isMobileSize = checkMobile();
+        resizeCanvas();
+        ScrollTrigger.refresh();
+        updateCachedScrollMetrics();
+      }
+    }, 220);
   }, { passive: true });
 
   /* ------------------------------------------------------------------------

@@ -21,9 +21,9 @@
   --font-display: 'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'Space Grotesk', monospace;
 
-  /* Harmonized Section Spacings & Rhythm (Awwwards Standard) */
-  --section-pad-y: clamp(140px, 16vh, 220px);
-  --section-pad-y-sm: clamp(80px, 10vh, 130px);
+  /* Harmonized Section Spacings & Rhythm (Equilibrado e sem vácuos) */
+  --section-pad-y: clamp(64px, 7vw, 110px);
+  --section-pad-y-sm: clamp(48px, 5.5vw, 80px);
   --header-h: 92px;
   --ease-smooth: cubic-bezier(.22, 1, .36, 1);
 
@@ -46,13 +46,8 @@
   padding: 0;
 }
 
-html.lenis,
-html.lenis body {
-  height: auto;
-}
-
-.lenis-smooth {
-  scroll-behavior: auto !important;
+html {
+  scroll-behavior: smooth;
 }
 
 body {
@@ -320,17 +315,19 @@ svg {
 .loading-blueprint-svg {
   width: 100%;
   height: 100%;
+  max-height: 70vh;
+  transform: translateY(-4vh);
   object-fit: contain;
-  opacity: 0.9;
+  opacity: 0.95;
 }
 
 .loading-blueprint-svg line,
 .loading-blueprint-svg path {
-  stroke: rgba(200, 164, 107, 0.55);
-  stroke-width: 1.25px;
+  stroke: rgba(200, 164, 107, 0.75) !important;
+  stroke-width: 1.5px !important;
   stroke-dasharray: 2000;
   stroke-dashoffset: 2000;
-  filter: drop-shadow(0 0 3px rgba(200, 164, 107, 0.25));
+  filter: drop-shadow(0 0 4px rgba(200, 164, 107, 0.35));
   will-change: stroke-dashoffset;
 }
 
@@ -855,7 +852,8 @@ nav.main-nav {
    ========================================================================== */
 .hero {
   position: relative;
-  height: 100vh;
+  height: 100svh;
+  min-height: 580px;
   display: flex;
   align-items: center;
   padding-top: var(--header-h);
@@ -863,7 +861,7 @@ nav.main-nav {
 }
 
 .hero--video {
-  padding-bottom: 90px;
+  padding-bottom: clamp(48px, 7vh, 80px);
 }
 
 .hero-video-wrap {
@@ -1123,16 +1121,25 @@ nav.main-nav {
 /* Indicador de Mouse Animado */
 .scroll-indicator {
   position: absolute;
-  bottom: 40px;
-  left: 48px;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   color: var(--text-gray);
-  font-size: 11.5px;
-  letter-spacing: .22em;
+  font-size: 11px;
+  letter-spacing: .2em;
   text-transform: uppercase;
   z-index: 10;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+@media (max-height: 760px) {
+  .scroll-indicator {
+    display: none !important;
+  }
 }
 
 .scroll-indicator .mouse {
@@ -1182,7 +1189,7 @@ section {
 
 .section-head {
   max-width: 720px;
-  margin: 0 auto clamp(60px, 8vh, 90px);
+  margin: 0 auto clamp(36px, 5vh, 60px);
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -1193,7 +1200,7 @@ section {
   width: 100%;
   max-width: 1200px;
   height: 1px;
-  margin: clamp(48px, 7vh, 88px) auto 0;
+  margin: clamp(32px, 4.5vh, 56px) auto 0;
   background: linear-gradient(90deg, transparent 0%, rgba(200, 164, 107, 0.12) 15%, rgba(200, 164, 107, 0.28) 50%, rgba(200, 164, 107, 0.12) 85%, transparent 100%);
 }
 
@@ -1278,8 +1285,6 @@ section {
 
 .word-reveal {
   display: inline-block;
-  will-change: opacity, color;
-  transition: opacity 0.3s ease;
 }
 
 .sobre-actions {
@@ -1370,13 +1375,6 @@ section {
   object-fit: cover;
   filter: contrast(1.05) brightness(0.96) saturate(1.05);
   transform: scale(1);
-  will-change: transform;
-  transition: transform 0.85s var(--ease-smooth);
-}
-
-.sobre-image-wrapper:hover .sobre-clean-img,
-.sobre-image-wrapper:hover .sobre-blur-img {
-  transform: scale(1.04);
 }
 
 .sobre-image-overlay {
@@ -1526,19 +1524,18 @@ section {
 .diff-card {
   position: relative;
   text-align: left;
-  padding: clamp(34px, 3.4vw, 46px) clamp(28px, 2.8vw, 38px);
+  padding: clamp(30px, 3vw, 44px) clamp(24px, 2.6vw, 36px);
   background: linear-gradient(145deg, rgba(22, 19, 16, 0.6) 0%, rgba(12, 10, 8, 0.8) 100%);
   border: 1px solid rgba(245, 228, 199, 0.12);
   border-radius: 20px;
   box-shadow: var(--card-shadow);
-  transition: all 0.45s var(--ease-smooth);
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
   display: flex;
   flex-direction: column;
 }
 
 .diff-card:hover {
   border-color: rgba(200, 164, 107, 0.4);
-  transform: translateY(-4px);
   box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6), 0 0 30px rgba(200, 164, 107, 0.12);
 }
 
@@ -1618,16 +1615,14 @@ section {
   overflow: hidden;
   background: linear-gradient(160deg, rgba(22, 19, 16, 0.7) 0%, rgba(12, 10, 8, 0.95) 100%);
   border: 1px solid rgba(245, 228, 199, 0.12);
-  will-change: transform, border-color, box-shadow;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
-  transition: all 0.45s var(--ease-smooth);
+  transition: border-color 0.35s ease, box-shadow 0.35s ease;
   display: flex;
   flex-direction: column;
 }
 
 .service-card:hover {
   border-color: rgba(200, 164, 107, 0.45);
-  transform: translateY(-6px);
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7), 0 0 35px rgba(200, 164, 107, 0.12);
 }
 
@@ -1830,8 +1825,11 @@ section {
 .bucks-showcase-section {
   position: relative;
   width: 100%;
-  min-height: 100vh;
-  padding: clamp(120px, 14vh, 180px) 0 clamp(80px, 10vh, 120px);
+  height: 100vh;
+  height: 100svh;
+  min-height: 100svh;
+  max-height: 100svh;
+  padding: clamp(74px, 9vh, 96px) 0 clamp(20px, 3vh, 36px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1846,47 +1844,57 @@ section {
   position: relative;
   width: 100%;
   height: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: clamp(12px, 2vh, 24px);
 }
 
 .bucks-header {
   text-align: center;
-  margin-bottom: clamp(32px, 5vh, 56px);
+  margin-bottom: 0;
   z-index: 10;
   position: relative;
   padding: 0 24px;
+  flex-shrink: 0;
+}
+
+.bucks-header .bucks-pill {
+  margin-bottom: 8px;
 }
 
 .bucks-title {
   font-family: var(--font-display);
-  font-size: clamp(24px, 2.8vw, 38px);
+  font-size: clamp(22px, 2.5vw, 34px);
   font-weight: 800;
   letter-spacing: -0.025em;
   color: var(--white);
   line-height: 1.1;
-  margin: 12px 0 16px;
+  margin: 4px 0 8px;
   text-transform: uppercase;
 }
 
 .bucks-subtitle {
   font-family: var(--font-main);
   color: var(--text-gray);
-  font-size: clamp(14px, 1.15vw, 16px);
+  font-size: clamp(13.5px, 1.05vw, 15.5px);
   font-weight: 400;
-  max-width: 600px;
+  max-width: 560px;
   margin: 0 auto;
-  line-height: 1.6;
+  line-height: 1.5;
   letter-spacing: -0.01em;
 }
 
-/* Track Container - Pinned on Desktop */
+/* Track Container - Centralizado no meio da tela sem cortar o topo nem a base */
 .bucks-track-container {
   position: relative;
   width: 100%;
-  min-height: 640px;
+  flex: 1 1 auto;
+  min-height: 320px;
+  max-height: 430px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1896,11 +1904,11 @@ section {
 /* SVG Curved Dashed Ruler Rail (Assinatura Buck's Sauce Arco Circular) */
 .bucks-rail-wrap {
   position: absolute;
-  top: 90px;
+  top: 55px;
   left: 50%;
   transform: translateX(-50%);
   width: 2400px;
-  height: 600px;
+  height: 520px;
   pointer-events: none;
   z-index: 1;
 }
@@ -1915,18 +1923,21 @@ section {
 .bucks-cards-track {
   position: relative;
   width: 100%;
-  height: 640px;
+  height: 360px;
   z-index: 2;
   overflow: visible;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* Individual Card (Posicionamento Radial Absoluto com Origem Central) */
+/* Individual Card (Posicionamento Radial Absoluto com Origem Central — Transparente sem caixa) */
 .bucks-card {
   position: absolute;
-  top: 15px;
+  top: 8px;
   left: 50%;
-  width: 500px;
-  margin-left: -250px;
+  width: 520px;
+  margin-left: -260px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1935,6 +1946,11 @@ section {
   will-change: transform, opacity;
   transform-origin: 50% 50%;
   opacity: 0;
+  overflow: visible;
+  padding: 6px 10px;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .bucks-card-inner {
@@ -1943,45 +1959,52 @@ section {
   align-items: center;
   text-align: center;
   width: 100%;
+  overflow: visible;
 }
 
-/* Giant Outline Number (Buck's Sauce Signature) */
+/* Giant Outline Number (Buck's Sauce Signature) - Sem Cortes e Proporcional à Tela */
 .bucks-number {
   font-family: var(--font-mono);
-  font-size: clamp(72px, 8.5vw, 120px);
+  font-size: clamp(76px, 8.8vw, 112px);
   font-weight: 800;
-  line-height: 0.9;
+  line-height: 1.0;
   letter-spacing: -0.04em;
   color: transparent;
-  -webkit-text-stroke: 2px var(--cream);
+  -webkit-text-stroke: 2.2px var(--cream);
   display: flex;
   justify-content: center;
-  align-items: baseline;
-  margin-bottom: 14px;
-  filter: drop-shadow(0 0 20px rgba(245, 228, 199, 0.2));
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 4px 16px;
+  overflow: visible;
+  filter: drop-shadow(0 0 24px rgba(245, 228, 199, 0.25));
 }
 
 .bucks-digit {
   display: inline-block;
   will-change: transform;
+  overflow: visible;
+  padding: 0 4px;
 }
 
-/* Beige/Cream Pill Badge */
+/* Beige/Cream Pill Badge - Centralizado e em Linha Única */
 .bucks-pill {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
   background: var(--cream);
   color: var(--cream-dark);
   border-radius: 9999px;
-  padding: 8px 20px;
+  padding: 7px 20px;
   font-family: var(--font-main);
   font-weight: 800;
-  font-size: clamp(11px, 0.95vw, 13px);
+  font-size: clamp(11px, 0.92vw, 12.5px);
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .bucks-dot {
@@ -1995,12 +2018,12 @@ section {
 /* Editorial Body Typography */
 .bucks-copy {
   font-family: var(--font-main);
-  font-size: clamp(14.5px, 1.15vw, 16.5px);
+  font-size: clamp(14px, 1.08vw, 15.5px);
   font-weight: 400;
-  line-height: 1.6;
+  line-height: 1.55;
   color: var(--white);
-  max-width: 480px;
-  margin: 0 auto 22px;
+  max-width: 460px;
+  margin: 0 auto 16px;
   text-wrap: balance;
   text-align: center;
   letter-spacing: -0.01em;
@@ -2085,12 +2108,15 @@ section {
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  height: 84vh;
+  height: 100svh;
+  max-height: 100svh;
   z-index: 12;
   width: 100%;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 12px 48px 24px;
+  padding: clamp(76px, 10vh, 96px) 24px clamp(28px, 4vh, 44px);
+  box-sizing: border-box;
+  gap: 8px;
 }
 
 .cta-content-top {
@@ -2099,15 +2125,20 @@ section {
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex-shrink: 0;
+}
+
+.cta-content-top .bucks-pill {
+  margin-bottom: 12px;
 }
 
 .cta-content-top h2 {
   font-family: var(--font-display);
-  font-size: clamp(22px, 2.6vw, 36px);
+  font-size: clamp(22px, 2.5vw, 34px);
   font-weight: 800;
-  max-width: 820px;
-  margin-bottom: 12px;
-  line-height: 1.12;
+  max-width: 780px;
+  margin-bottom: 10px;
+  line-height: 1.1;
   letter-spacing: -0.025em;
   color: var(--white);
   text-transform: uppercase;
@@ -2121,19 +2152,24 @@ section {
   font-family: var(--font-main);
   color: var(--text-gray);
   font-weight: 400;
-  max-width: 580px;
+  max-width: 540px;
   margin: 0 auto;
-  line-height: 1.55;
-  font-size: clamp(14px, 1.15vw, 16px);
+  line-height: 1.5;
+  font-size: clamp(13.5px, 1.1vw, 15.5px);
   letter-spacing: -0.01em;
+}
+
+.footer-continuation-indicator {
+  display: none !important;
 }
 
 .cta-content-bottom {
   text-align: center;
   z-index: 15;
+  flex-shrink: 0;
 }
 
-/* Palco 3D Full-Screen do Extintor (Zero cortes - Canvas 100vw x 100vh) */
+/* Palco 3D Full-Screen do Extintor (100vw x 100vh para aproximação total até bater na tela sem cortes) */
 .cta-extintor-stage {
   position: absolute;
   inset: 0;
@@ -2144,16 +2180,17 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
-  overflow: hidden;
+  overflow: visible;
+  transform-origin: 50% 50%;
 }
 
 .extintor-glow-halo {
   position: absolute;
-  top: 53%;
+  top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(520px, 80vw);
-  height: min(520px, 80vw);
+  width: min(380px, 75vw);
+  height: min(380px, 75vw);
   border-radius: 50%;
   background: radial-gradient(circle, rgba(200, 164, 107, 0.22) 0%, rgba(200, 164, 107, 0.04) 55%, transparent 75%);
   pointer-events: none;
@@ -2166,33 +2203,11 @@ section {
   height: 100%;
   pointer-events: auto;
   z-index: 2;
-  transform: none;
+  transform: none !important;
 }
 
-/* Véu de Cobertura Total do Extintor (Garante 100% de tela coberta antes do Footer) */
 .extintor-cover-veil {
-  position: absolute;
-  inset: -60vw;
-  background: radial-gradient(circle, #B81414 0%, #8A0B0F 55%, #4A0507 80%, #080808 100%);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 5;
-  border-radius: 50%;
-  transform: scale(0.08);
-  will-change: opacity, transform;
-}
-
-@media (max-height: 800px) {
-  .cta-container {
-    height: 85vh;
-  }
-}
-
-@media (max-width: 680px) {
-  .cta-container {
-    padding: 0 20px;
-    height: 88vh;
-  }
+  display: none !important;
 }
 
 footer {
@@ -2694,16 +2709,18 @@ footer {
     transform: translate3d(0, 0, 0);
   }
 
+  nav.main-nav,
   .nav-list {
-    display: none;
+    display: none !important;
   }
 
   .header-actions {
-    margin-right: 8px;
+    margin-left: auto;
+    margin-right: 12px;
   }
 
   .btn-whatsapp-header {
-    padding: 6px 13px;
+    padding: 8px 12px;
     font-size: 12px;
   }
 
@@ -2720,30 +2737,41 @@ footer {
     display: flex;
   }
 
+  /* Oculta o mouse indicator no mobile/tablet para nunca sobrepor os botões do Hero */
+  .scroll-indicator {
+    display: none !important;
+  }
+
+  .hero {
+    min-height: 100svh;
+    padding-top: 76px;
+    padding-bottom: 32px;
+  }
+
   .hero-big-footer {
     flex-direction: column;
     align-items: flex-start;
-    gap: 24px;
+    gap: 20px;
   }
 
   .hero-actions {
     justify-content: flex-start;
     flex-wrap: wrap;
-    gap: 14px;
+    gap: 12px;
     width: 100%;
   }
 
   .sobre-intro-grid {
     grid-template-columns: 1fr;
-    gap: 36px;
-    margin-bottom: 50px;
+    gap: 32px;
+    margin-bottom: 44px;
   }
 
   .sobre-metrics-rail {
     grid-template-columns: repeat(2, 1fr);
-    gap: 28px 16px;
-    padding: 28px 20px;
-    margin-bottom: 50px;
+    gap: 24px 14px;
+    padding: 24px 16px;
+    margin-bottom: 44px;
   }
 
   .metric-divider {
@@ -2751,67 +2779,117 @@ footer {
   }
 
   .sobre-image-wrapper {
-    height: 360px;
+    height: 330px;
+  }
+
+  .diff-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 
   .services-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    gap: 20px;
   }
 
   /* ==========================================================================
      BUCKS SHOWCASE RESPONSIVE (MOBILE & TABLET) - PINNED WHEEL ROTATION
      ========================================================================== */
   .bucks-showcase-section {
-    min-height: 100vh !important;
-    height: 100vh !important;
-    padding: 60px 0 20px !important;
+    min-height: 100svh !important;
+    height: 100svh !important;
+    padding: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
     overflow: hidden !important;
   }
 
+  .bucks-showcase-wrapper {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding-top: clamp(64px, 8.5vh, 84px) !important;
+    box-sizing: border-box !important;
+  }
+
+  .bucks-header {
+    text-align: center !important;
+    margin-bottom: 8px !important;
+    padding: 0 16px !important;
+    z-index: 10 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .bucks-header .bucks-pill {
+    margin-bottom: 6px !important;
+  }
+
+  .bucks-title {
+    font-size: clamp(20px, 5.4vw, 26px) !important;
+    line-height: 1.12 !important;
+    margin: 4px 0 6px !important;
+  }
+
+  .bucks-subtitle {
+    font-size: 12.5px !important;
+    line-height: 1.4 !important;
+    max-width: 310px !important;
+    margin: 0 auto !important;
+  }
+
   .bucks-track-container {
-    min-height: 540px !important;
+    min-height: 380px !important;
+    height: 380px !important;
+    flex: 1 1 auto !important;
     overflow: visible !important;
     justify-content: center !important;
-    align-items: center !important;
+    align-items: flex-start !important;
     padding: 0 !important;
+    margin-top: 6px !important;
   }
 
   .bucks-cards-track {
     position: relative !important;
     display: block !important;
     width: 100% !important;
-    height: 540px !important;
+    height: 380px !important;
     padding: 0 !important;
     overflow: visible !important;
   }
 
   .bucks-card {
     position: absolute !important;
-    top: 10px !important;
+    top: 4px !important;
     left: 50% !important;
-    width: min(340px, 88vw) !important;
-    margin-left: calc(min(340px, 88vw) / -2) !important;
-    max-width: 360px !important;
+    width: min(336px, 90vw) !important;
+    margin-left: calc(min(336px, 90vw) / -2) !important;
+    max-width: 350px !important;
+    padding: 22px 20px 26px !important;
     transform-origin: 50% 50% !important;
+    overflow: visible !important;
   }
 
   .bucks-rail-wrap {
     display: block !important;
-    width: 1400px !important;
-    height: 480px !important;
-    top: 60px !important;
+    width: 1100px !important;
+    height: 360px !important;
+    top: 32px !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    opacity: 0.7 !important;
+    opacity: 0.55 !important;
   }
 
   /* ==========================================================================
-     CTA STRIP + FOOTER MOBILE ERGONOMICS (COBERTURA TOTAL & PIN SEAMLESS)
+     CTA STRIP + FOOTER MOBILE ERGONOMICS (ZERO SOBREPOSIÇÃO DO EXTINTOR)
      ========================================================================== */
   .cta-footer-group {
     width: 100% !important;
-    height: 100vh !important;
+    height: 100svh !important;
     overflow: hidden !important;
     background: #080808 !important;
   }
@@ -2820,7 +2898,7 @@ footer {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
-    height: 100vh !important;
+    height: 100svh !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
@@ -2829,31 +2907,73 @@ footer {
   }
 
   .cta-container {
-    height: 85vh !important;
+    height: 100svh !important;
+    min-height: 100svh !important;
+    max-height: 100svh !important;
     display: flex !important;
     flex-direction: column !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 24px 20px !important;
-    gap: 16px !important;
+    padding: clamp(68px, 9vh, 84px) 18px clamp(26px, 4vh, 38px) !important;
+    gap: 6px !important;
+    box-sizing: border-box !important;
+  }
+
+  .cta-content-top {
+    padding-top: 0 !important;
+    max-width: 350px !important;
+    text-align: center !important;
+    flex-shrink: 0 !important;
+  }
+
+  .cta-content-top .bucks-pill {
+    margin-bottom: 8px !important;
   }
 
   .cta-content-top h2 {
-    font-size: clamp(22px, 5.8vw, 32px) !important;
-    margin-bottom: 10px !important;
+    font-size: clamp(18px, 5vw, 23px) !important;
+    line-height: 1.15 !important;
+    margin-bottom: 6px !important;
   }
 
   .cta-strip p.cta-desc {
-    font-size: 13.5px !important;
-    line-height: 1.5 !important;
+    font-size: 12.5px !important;
+    line-height: 1.4 !important;
+    max-width: 310px !important;
+    margin: 0 auto !important;
+  }
+
+  .cta-extintor-stage {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+  }
+
+  .cta-extintor-stage model-viewer {
+    transform: none !important;
+  }
+
+  .cta-content-bottom {
+    z-index: 15 !important;
+    width: 100% !important;
+    max-width: 280px !important;
+    margin-bottom: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .cta-content-bottom .btn-gold {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 13px 20px !important;
+    font-size: 13px !important;
   }
 
   .footer-continuation-indicator {
     display: none !important;
-  }
-
-  .cta-extintor-stage model-viewer {
-    transform: none;
   }
 
   footer#contato {
@@ -3007,7 +3127,7 @@ footer {
   }
 
   section {
-    padding: 80px 0;
+    padding: 72px 0;
   }
 
   .hero {
@@ -3060,32 +3180,48 @@ footer {
   }
 
   .bucks-card {
-    width: min(320px, 88vw) !important;
-    margin-left: calc(min(320px, 88vw) / -2) !important;
-    max-width: 320px !important;
+    width: min(340px, 90vw) !important;
+    margin-left: calc(min(340px, 90vw) / -2) !important;
+    max-width: 360px !important;
+    overflow: visible !important;
   }
 
   .bucks-number {
-    font-size: 68px !important;
-    margin-bottom: 10px !important;
+    font-size: clamp(80px, 18vw, 105px) !important;
+    line-height: 1.0 !important;
+    margin-bottom: 12px !important;
+    padding: 2px 10px !important;
+    overflow: visible !important;
   }
 
   .bucks-pill {
-    padding: 7px 16px !important;
-    font-size: 10.5px !important;
-    margin-bottom: 14px !important;
+    padding: 7px 18px !important;
+    font-size: 11px !important;
+    margin-bottom: 16px !important;
+    white-space: nowrap !important;
   }
 
   .bucks-copy {
-    font-size: 13.5px !important;
-    line-height: 1.55 !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
     margin-bottom: 18px !important;
   }
 
   .footer-grid {
-    grid-template-columns: 1fr !important;
-    gap: 24px !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 24px 16px !important;
     padding-bottom: 24px !important;
+  }
+
+  .footer-brand {
+    grid-column: 1 / -1 !important;
+  }
+
+  .footer-col ul li a, .footer-col ul li {
+    font-size: 13px !important;
+    min-height: 38px !important;
+    display: inline-flex !important;
+    align-items: center !important;
   }
 
   .footer-bottom {
@@ -3182,16 +3318,9 @@ html.low-perf .project-badge {
 
 html.ultra-low-end .bucks-card,
 html.low-perf .bucks-card {
-  background: #141210 !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
-  border: 1px solid rgba(245, 228, 199, 0.14) !important;
-}
-
-html.ultra-low-end .bucks-pill,
-html.low-perf .bucks-pill,
-html.ultra-low-end .hero-trans-pill,
-html.low-perf .hero-trans-pill {
-  background: rgba(22, 19, 16, 0.95) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 html.ultra-low-end .service-card,
@@ -3223,4 +3352,103 @@ html.low-perf #bg-canvas {
 html.ultra-low-end header,
 html.low-perf header {
   transition: transform .3s ease, background .3s ease, border-color .3s ease !important;
+}
+
+/* ==========================================================================
+   AJUSTES FINAIS — Selos, Preloader mobile, Espaçamento e Tipografia
+   ========================================================================== */
+/* Tipografia: títulos com Space Grotesk/Inter Tight, ritmo consistente */
+h1, h2, h3 { line-height: 1.08; text-wrap: balance; }
+h2 { letter-spacing: -0.03em; }
+p { text-wrap: pretty; }
+.section-head h2, .sobre-intro-left h2 { font-size: clamp(28px, 3.4vw, 46px); margin-bottom: 16px; }
+.section-head p { font-size: clamp(15px, 1.2vw, 17px); line-height: 1.65; max-width: 620px; }
+.section-head { margin-bottom: clamp(36px, 4.5vw, 64px); }
+.hero-big-title { font-size: clamp(30px, 4.2vw, 60px); line-height: 1.04; letter-spacing: -0.035em; }
+.hero-sub { font-size: clamp(15px, 1.15vw, 17px); line-height: 1.65; }
+
+/* Selos sempre visíveis e legíveis */
+.hero-pill-badge,
+.cad-telemetry-badge,
+.service-badge-tag,
+.bucks-pill,
+.hero-trans-pill,
+.project-badge {
+  opacity: 1 !important;
+  visibility: visible !important;
+  z-index: 5;
+}
+.hero-pill-badge { white-space: nowrap; font-family: var(--font-mono); font-weight: 700; line-height: 1; padding: 8px 16px; }
+.service-badge-tag { line-height: 1; white-space: nowrap; max-width: calc(100% - 36px); }
+.service-media { isolation: isolate; }
+.service-media img { z-index: 0; }
+.cad-telemetry-badge { background: rgba(12, 10, 8, 0.94) !important; border: 1px solid rgba(245, 228, 199, 0.22) !important; }
+.cad-telemetry-title, .cad-telemetry-meta { line-height: 1.35; }
+
+/* Preloader — desenho técnico visível e proporcional em telas mobile */
+@media (max-width: 991px) and (orientation: portrait) {
+  .loading-img {
+    padding: 0 16px;
+    align-items: center;
+    justify-content: center;
+  }
+  .loading-img-inner {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .loading-blueprint-svg {
+    width: 92vw;
+    max-width: 440px;
+    height: auto;
+    max-height: 52vh;
+    object-fit: contain;
+    transform: translateY(-4vh);
+  }
+  .loading-blueprint-svg line,
+  .loading-blueprint-svg path {
+    stroke: rgba(200, 164, 107, 0.85) !important;
+    stroke-width: 1.6px !important;
+    filter: drop-shadow(0 0 5px rgba(200, 164, 107, 0.45));
+  }
+  .loading-logo-backdrop {
+    width: 160px;
+    height: 160px;
+  }
+}
+
+@media (max-width: 680px) {
+  .hero-pill-badge { font-size: clamp(8.5px, 2.4vw, 10.5px); letter-spacing: 0.06em; padding: 7px 12px; gap: 8px; max-width: calc(100vw - 32px); }
+  .hero-big-title { font-size: clamp(28px, 8.4vw, 38px); }
+  .section-head h2, .sobre-intro-left h2 { font-size: clamp(26px, 7.4vw, 34px); }
+  .section-head { margin-bottom: 32px; }
+  .cad-telemetry-badge { flex-direction: column; align-items: flex-start; gap: 6px; left: 14px; right: 14px; bottom: 14px; padding: 10px 14px; }
+  .cad-telemetry-title { font-size: 10.5px; }
+  .cad-telemetry-meta { font-size: 9.5px; }
+  .service-badge-tag { top: 14px; left: 14px; font-size: 9.5px; padding: 6px 12px; }
+}
+
+/* Selos creme: fundo sólido e texto escuro em todos os aparelhos */
+.bucks-pill, html.low-perf .bucks-pill, html.ultra-low-end .bucks-pill,
+.hero-pill-badge, html.low-perf .hero-pill-badge, html.ultra-low-end .hero-pill-badge,
+.hero-trans-pill, html.low-perf .hero-trans-pill, html.ultra-low-end .hero-trans-pill {
+  background: var(--cream) !important;
+  color: var(--cream-dark) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  border-radius: 9999px !important;
+  border: 1px solid rgba(200, 164, 107, 0.35) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35) !important;
+  white-space: nowrap !important;
+}
+.bucks-pill .bucks-pill-label, .hero-pill-badge .hero-pill-text, .hero-trans-pill span {
+  color: var(--cream-dark) !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+}
+.bucks-pill .bucks-dot, .hero-pill-badge .hero-pill-dot, .hero-trans-pill .trans-dot {
+  background: var(--cream-dark) !important;
+  opacity: 0.85 !important;
 }

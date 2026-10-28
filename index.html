@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="lenis-smooth">
+<html lang="pt-BR">
 
 <head>
   <meta charset="UTF-8">
@@ -9,10 +9,19 @@
     content="Extinmais: engenharia de incêndio com segurança e precisão. Projetos, laudos e sistemas de proteção contra incêndio de alto padrão.">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 
+  <!-- F5 Reload — Forçar sempre reinício suave no topo absoluto -->
+  <script>
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+  </script>
+
   <!-- Google Fonts: Buck's Sauce Typography Caliber (Inter Tight + Space Grotesk + Syne) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@500;600;700;800&family=Syne:wght@700;800&display=swap"
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter+Tight:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Space+Grotesk:wght@500;600;700;800&family=Syne:wght@700;800&display=swap"
     rel="stylesheet">
 
   <!-- Hardware Profile & Ultra-Low-End Detection (Zero Layout Shift) -->
@@ -28,19 +37,19 @@
         var isLow = isUltra || (mem <= 3) || (cores <= 4) || (isTouch && window.innerWidth <= 600);
         if (isUltra) document.documentElement.classList.add('ultra-low-end');
         if (isLow) document.documentElement.classList.add('low-perf');
-      } catch (e) {}
+      } catch (e) { }
     })();
   </script>
+
+  <!-- Pré-carregamento prioritário do modelo 3D do Extintor durante o Preloader -->
+  <link rel="preload" href="glb/extintor.glb" as="fetch" crossorigin="anonymous">
 
   <!-- GSAP + ScrollTrigger -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 
-  <!-- Lenis (Smooth Scroll) -->
-  <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
-
-  <!-- model-viewer (Google) — Carregamento Otimizado e Deferido -->
-  <script type="module" defer src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <!-- model-viewer (Google) — Carregamento Imediato no Preloader -->
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -57,9 +66,11 @@
         <!-- Blueprint Architectural Wireframe Vectors -->
         <div class="loading-img">
           <div class="loading-img-inner">
-            <svg class="loading-blueprint-svg" width="100%" height="100%" viewBox="0 0 1712 890" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <svg class="loading-blueprint-svg" preserveAspectRatio="xMidYMid meet" width="100%" height="100%"
+              viewBox="0 0 1712 890" fill="none" xmlns="http://www.w3.org/2000/svg">
               <line x1="138.576" y1="747.096" x2="1582" y2="747.096" stroke="#282828" stroke-width="1.2"></line>
-              <path d="M216.654 629.479H233.67L233.67 747.096H216.653L216.654 629.479Z" stroke="#282828" stroke-width="1.2"></path>
+              <path d="M216.654 629.479H233.67L233.67 747.096H216.653L216.654 629.479Z" stroke="#282828"
+                stroke-width="1.2"></path>
               <path d="M233.67 629.479H401.836" stroke="#282828" stroke-width="1.2"></path>
               <path d="M233.67 660.01L479.913 660.01" stroke="#282828" stroke-width="1.2"></path>
               <path d="M233.67 670.521L479.913 670.521" stroke="#282828" stroke-width="1.2"></path>
@@ -71,24 +82,34 @@
               <path d="M233.67 736.585L479.913 736.585" stroke="#282828" stroke-width="1.2"></path>
               <path d="M256.693 660.511L256.693 629.48" stroke="#282828" stroke-width="1.2"></path>
               <path d="M380.814 174.031H627.057" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M380.814 629.48L380.814 174.031H401.835L401.835 629.48" stroke="#282828" stroke-width="1.2"></path>
+              <path d="M380.814 629.48L380.814 174.031H401.835L401.835 629.48" stroke="#282828" stroke-width="1.2">
+              </path>
               <path d="M401.835 361.215L555.987 361.215" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M401.835 410.266H555.987M401.835 437.293H555.987M401.835 429.285H555.987" stroke="#282828" stroke-width="1.2"></path>
+              <path d="M401.835 410.266H555.987M401.835 437.293H555.987M401.835 429.285H555.987" stroke="#282828"
+                stroke-width="1.2"></path>
               <path d="M401.835 660.511L401.835 174.031" stroke="#282828" stroke-width="1.2"></path>
               <path d="M479.913 576.428L555.988 576.428" stroke="#282828" stroke-width="1.2"></path>
               <path d="M479.913 747.597L479.913 576.428" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M555.989 747.597L555.989 174.031L574.671 174.031M574.671 747.597L574.671 174.031M574.671 174.031H578.174L578.174 747.597" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M578.172 576.428C635.049 576.428 669.278 576.428 726.155 576.428" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M578.347 410.667L726.156 410.266M578.347 437.693L726.156 437.293M578.347 429.685L726.156 429.285" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M578.673 238.094H726.155M578.673 208.064H726.155M578.673 230.086H726.155" stroke="#282828" stroke-width="1.2"></path>
+              <path
+                d="M555.989 747.597L555.989 174.031L574.671 174.031M574.671 747.597L574.671 174.031M574.671 174.031H578.174L578.174 747.597"
+                stroke="#282828" stroke-width="1.2"></path>
+              <path d="M578.172 576.428C635.049 576.428 669.278 576.428 726.155 576.428" stroke="#282828"
+                stroke-width="1.2"></path>
+              <path d="M578.347 410.667L726.156 410.266M578.347 437.693L726.156 437.293M578.347 429.685L726.156 429.285"
+                stroke="#282828" stroke-width="1.2"></path>
+              <path d="M578.673 238.094H726.155M578.673 208.064H726.155M578.673 230.086H726.155" stroke="#282828"
+                stroke-width="1.2"></path>
               <path d="M627.058 208.064L627.058 174.031" stroke="#282828" stroke-width="1.2"></path>
               <path d="M654.418 576.427L654.418 437.29" stroke="#282828" stroke-width="1.2"></path>
               <path d="M654.423 410.264L654.423 238.094" stroke="#282828" stroke-width="1.2"></path>
               <path d="M657.422 576.427L657.422 437.29" stroke="#282828" stroke-width="1.2"></path>
               <path d="M657.426 410.264L657.426 238.094" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M726.157 143L726.157 629.48H742.173L742.173 143H726.157Z" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M742.171 238.094H979.405M742.171 208.064H979.405M742.171 230.086H979.405" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M742.171 410.266H979.405M742.171 437.293H979.405M742.171 429.285H979.405" stroke="#282828" stroke-width="1.2"></path>
+              <path d="M726.157 143L726.157 629.48H742.173L742.173 143H726.157Z" stroke="#282828" stroke-width="1.2">
+              </path>
+              <path d="M742.171 238.094H979.405M742.171 208.064H979.405M742.171 230.086H979.405" stroke="#282828"
+                stroke-width="1.2"></path>
+              <path d="M742.171 410.266H979.405M742.171 437.293H979.405M742.171 429.285H979.405" stroke="#282828"
+                stroke-width="1.2"></path>
               <path d="M742.171 613.464H979.405" stroke="#282828" stroke-width="1.2"></path>
               <path d="M742.171 629.48H979.405" stroke="#282828" stroke-width="1.2"></path>
               <path d="M796.225 410.264L796.225 238.094" stroke="#282828" stroke-width="1.2"></path>
@@ -103,9 +124,12 @@
               <path d="M922.349 613.464L922.349 437.29" stroke="#282828" stroke-width="1.2"></path>
               <path d="M925.353 410.264L925.353 238.094" stroke="#282828" stroke-width="1.2"></path>
               <path d="M925.353 613.464L925.353 437.29" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M979.406 143L979.406 629.48H995.422L995.422 143H979.406Z" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M995.42 437.293H1144.57M995.42 429.285H1144.57M995.42 410.266L1144.57 410.266" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M995.422 238.094H1144.57M995.422 208.064H1144.57M995.422 230.086H1144.57" stroke="#282828" stroke-width="1.2"></path>
+              <path d="M979.406 143L979.406 629.48H995.422L995.422 143H979.406Z" stroke="#282828" stroke-width="1.2">
+              </path>
+              <path d="M995.42 437.293H1144.57M995.42 429.285H1144.57M995.42 410.266L1144.57 410.266" stroke="#282828"
+                stroke-width="1.2"></path>
+              <path d="M995.422 238.094H1144.57M995.422 208.064H1144.57M995.422 230.086H1144.57" stroke="#282828"
+                stroke-width="1.2"></path>
               <path d="M995.422 361.215L1144.57 361.215" stroke="#282828" stroke-width="1.2"></path>
               <path d="M995.422 576.428L1144.57 576.428" stroke="#282828" stroke-width="1.2"></path>
               <path d="M1063.48 361.215L1063.48 238.094" stroke="#282828" stroke-width="1.2"></path>
@@ -114,13 +138,17 @@
               <path d="M1066.82 576.427L1066.82 437.29" stroke="#282828" stroke-width="1.2"></path>
               <path d="M1093.52 174.031H1339.76" stroke="#282828" stroke-width="1.2"></path>
               <path d="M1093.52 208.064L1093.52 174.031" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M1144.57 747.597L1144.57 174.031L1163.25 174.031M1163.25 747.597L1163.25 174.031M1163.25 174.031H1166.75L1166.75 747.597" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M1166.25 410.266L1320.78 410.207M1166.25 437.292L1320.78 437.234M1166.25 429.284L1320.78 429.226" stroke="#282828" stroke-width="1.2"></path>
+              <path
+                d="M1144.57 747.597L1144.57 174.031L1163.25 174.031M1163.25 747.597L1163.25 174.031M1163.25 174.031H1166.75L1166.75 747.597"
+                stroke="#282828" stroke-width="1.2"></path>
+              <path d="M1166.25 410.266L1320.78 410.207M1166.25 437.292L1320.78 437.234M1166.25 429.284L1320.78 429.226"
+                stroke="#282828" stroke-width="1.2"></path>
               <path d="M1166.75 361.215L1320.74 361.215" stroke="#282828" stroke-width="1.2"></path>
               <path d="M1166.75 576.963L1241.61 576.963" stroke="#282828" stroke-width="1.2"></path>
               <path d="M1241.66 629.479H1502.92" stroke="#282828" stroke-width="1.2"></path>
               <path d="M1241.66 747.597L1241.66 576.428" stroke="#282828" stroke-width="1.2"></path>
-              <path d="M1320.74 629.48L1320.74 174.031H1341.76L1341.76 629.48" stroke="#282828" stroke-width="1.2"></path>
+              <path d="M1320.74 629.48L1320.74 174.031H1341.76L1341.76 629.48" stroke="#282828" stroke-width="1.2">
+              </path>
               <path d="M1502.92 747.596L1502.92 629.479" stroke="#282828" stroke-width="1.2"></path>
             </svg>
           </div>
@@ -138,7 +166,7 @@
           </div>
         </div>
 
-        <!-- Editorial Typography & Technical Metadata Columns -->
+        <!-- Editorial Typography -->
         <div class="loading-content">
           <div class="loading-content-title" id="loadingTitle">
             <div class="loading-percent-counter">
@@ -146,50 +174,6 @@
             </div>
             <div class="heading h4">
               SEGURANÇA <br>& PRECISÃO EM <br>ENGENHARIA <br>DE INCÊNDIO
-            </div>
-          </div>
-
-          <div class="loading-content-sub">
-            <!-- Column 1: Company Profile -->
-            <div class="loading-content-sub-item item1">
-              <div class="loading-content-sub-item-txt item-head">
-                <div class="txt txt-font-mono txt-10">BEM-VINDO À EXTINMAIS<br></div>
-                <div class="loading-content-sub-item-dash"></div>
-              </div>
-              <div class="loading-content-sub-item-txt">
-                <div class="txt txt-font-mono txt-10">TIPO </div>
-                <div class="txt txt-font-mono txt-10">:</div>
-                <div class="txt txt-font-mono txt-10">Engenharia e Segurança Contra Incêndio</div>
-              </div>
-              <div class="loading-content-sub-item-txt">
-                <div class="txt txt-font-mono txt-10">FUNDAÇÃO</div>
-                <div class="txt txt-font-mono txt-10">:</div>
-                <div class="txt txt-font-mono txt-10">2026</div>
-              </div>
-              <div class="loading-content-sub-item-txt item-space">
-                <div class="txt txt-font-mono txt-10">FOCO&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
-                <div class="txt txt-font-mono txt-10">:</div>
-                <div class="txt txt-font-mono txt-10">Proteção de Alto Padrão e AVCB<br>(Projetos / Laudos / Hidráulica)</div>
-              </div>
-              <div class="loading-content-sub-item-txt">
-                <div class="txt txt-font-mono txt-10">LOCALIZAÇÃO</div>
-                <div class="txt txt-font-mono txt-10">:</div>
-                <div class="txt txt-font-mono txt-10">São Paulo, SP — Brasil</div>
-              </div>
-            </div>
-
-            <!-- Column 2: System Boot Sequence -->
-            <div class="loading-content-sub-item item2">
-              <div class="loading-content-sub-item-txt"><div class="txt txt-font-mono txt-10">001 INICIALIZAR SISTEMA DE SEGURANÇA</div></div>
-              <div class="loading-content-sub-item-txt"><div class="txt txt-font-mono txt-10">002 CARREGAR MODELOS HIDRÁULICOS</div></div>
-              <div class="loading-content-sub-item-txt"><div class="txt txt-font-mono txt-10">003 CONFIGURAR LINHAS DE PRESSÃO</div></div>
-              <div class="loading-content-sub-item-txt"><div class="txt txt-font-mono txt-10">004 SINCRONIZAR SENSORES E ALARMES</div></div>
-              <div class="loading-content-sub-item-txt"><div class="txt txt-font-mono txt-10">005 VALIDAR NORMAS DO CORPO DE BOMBEIROS</div></div>
-              <div class="loading-content-sub-item-txt"><div class="txt txt-font-mono txt-10">006 OTIMIZAR SISTEMA DE SUPRESSÃO</div></div>
-              <div class="loading-content-sub-item-txt"><div class="txt txt-font-mono txt-10">007 TESTAR MATRIZ DE SIMULAÇÃO</div></div>
-              <div class="loading-content-sub-item-txt"><div class="txt txt-font-mono txt-10">008 ATIVAR MONITORAMENTO EM TEMPO REAL</div></div>
-              <div class="loading-content-sub-item-txt"><div class="txt txt-font-mono txt-10">009 EXECUTAR TELEMETRIA E DIAGNÓSTICO</div></div>
-              <div class="loading-content-sub-item-txt"><div class="txt txt-font-mono txt-10">010 SISTEMA PRONTO — EXTINMAIS</div></div>
             </div>
           </div>
         </div>
@@ -231,10 +215,12 @@
       </nav>
 
       <div class="header-actions">
-        <a href="https://wa.me/551140028922?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Extinmais%20e%20gostaria%20de%20um%20or%C3%A7amento." 
-           target="_blank" rel="noopener noreferrer" class="btn-whatsapp-header" aria-label="WhatsApp">
+        <a href="https://wa.me/551140028922?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Extinmais%20e%20gostaria%20de%20um%20or%C3%A7amento."
+          target="_blank" rel="noopener noreferrer" class="btn-whatsapp-header" aria-label="WhatsApp">
           <svg viewBox="0 0 24 24" fill="none" class="wa-mini-svg">
-            <path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.38 5.07L2 22l5.07-1.34C8.53 21.52 10.22 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm4.84 14.59c-.21.58-1.21 1.13-1.68 1.17-.46.04-.91.22-3.11-.67-2.65-1.07-4.34-3.78-4.47-3.95-.13-.18-1.07-1.42-1.07-2.71 0-1.29.68-1.92.92-2.18.24-.26.53-.33.71-.33.18 0 .36 0 .52.01.17.01.4-.06.62.48.23.55.78 1.91.85 2.05.07.14.12.3.02.48-.09.18-.14.29-.28.46-.14.17-.3.37-.43.5-.14.14-.29.3-.12.59.16.29.73 1.2 1.56 1.94 1.07.95 1.97 1.25 2.25 1.39.28.14.45.12.62-.07.17-.19.73-.85.92-1.14.19-.29.38-.24.64-.14.26.1.66.78 1.94.92.28.14.47.21.54.33.07.12.07.7-.14 1.28z" fill="currentColor"/>
+            <path
+              d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.38 5.07L2 22l5.07-1.34C8.53 21.52 10.22 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm4.84 14.59c-.21.58-1.21 1.13-1.68 1.17-.46.04-.91.22-3.11-.67-2.65-1.07-4.34-3.78-4.47-3.95-.13-.18-1.07-1.42-1.07-2.71 0-1.29.68-1.92.92-2.18.24-.26.53-.33.71-.33.18 0 .36 0 .52.01.17.01.4-.06.62.48.23.55.78 1.91.85 2.05.07.14.12.3.02.48-.09.18-.14.29-.28.46-.14.17-.3.37-.43.5-.14.14-.29.3-.12.59.16.29.73 1.2 1.56 1.94 1.07.95 1.97 1.25 2.25 1.39.28.14.45.12.62-.07.17-.19.73-.85.92-1.14.19-.29.38-.24.64-.14.26.1.66.78 1.94.92.28.14.47.21.54.33.07.12.07.7-.14 1.28z"
+              fill="currentColor" />
           </svg>
           <span>WhatsApp</span>
         </a>
@@ -252,10 +238,12 @@
     <a href="#projetos">Projetos</a>
     <a href="#servicos">Serviços</a>
     <a href="#contato">Contato</a>
-    <a href="https://wa.me/551140028922?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Extinmais%20e%20gostaria%20de%20um%20or%C3%A7amento." 
-       target="_blank" rel="noopener noreferrer" class="btn-whatsapp-mobile">
+    <a href="https://wa.me/551140028922?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Extinmais%20e%20gostaria%20de%20um%20or%C3%A7amento."
+      target="_blank" rel="noopener noreferrer" class="btn-whatsapp-mobile">
       <svg viewBox="0 0 24 24" fill="none" class="wa-mini-svg">
-        <path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.38 5.07L2 22l5.07-1.34C8.53 21.52 10.22 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm4.84 14.59c-.21.58-1.21 1.13-1.68 1.17-.46.04-.91.22-3.11-.67-2.65-1.07-4.34-3.78-4.47-3.95-.13-.18-1.07-1.42-1.07-2.71 0-1.29.68-1.92.92-2.18.24-.26.53-.33.71-.33.18 0 .36 0 .52.01.17.01.4-.06.62.48.23.55.78 1.91.85 2.05.07.14.12.3.02.48-.09.18-.14.29-.28.46-.14.17-.3.37-.43.5-.14.14-.29.3-.12.59.16.29.73 1.2 1.56 1.94 1.07.95 1.97 1.25 2.25 1.39.28.14.45.12.62-.07.17-.19.73-.85.92-1.14.19-.29.38-.24.64-.14.26.1.66.78 1.94.92.28.14.47.21.54.33.07.12.07.7-.14 1.28z" fill="currentColor"/>
+        <path
+          d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.38 5.07L2 22l5.07-1.34C8.53 21.52 10.22 22 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm4.84 14.59c-.21.58-1.21 1.13-1.68 1.17-.46.04-.91.22-3.11-.67-2.65-1.07-4.34-3.78-4.47-3.95-.13-.18-1.07-1.42-1.07-2.71 0-1.29.68-1.92.92-2.18.24-.26.53-.33.71-.33.18 0 .36 0 .52.01.17.01.4-.06.62.48.23.55.78 1.91.85 2.05.07.14.12.3.02.48-.09.18-.14.29-.28.46-.14.17-.3.37-.43.5-.14.14-.29.3-.12.59.16.29.73 1.2 1.56 1.94 1.07.95 1.97 1.25 2.25 1.39.28.14.45.12.62-.07.17-.19.73-.85.92-1.14.19-.29.38-.24.64-.14.26.1.66.78 1.94.92.28.14.47.21.54.33.07.12.07.7-.14 1.28z"
+          fill="currentColor" />
       </svg>
       <span>Falar no WhatsApp</span>
     </a>
@@ -283,7 +271,8 @@
         <span class="trans-dot"></span>
       </div>
       <h2 class="letter-reveal-target">SEGURANÇA NÃO É OPÇÃO.<br>É PRECISÃO MATEMÁTICA.</h2>
-      <p class="hero-transition-sub">Blindamos edificações, vidas e operações críticas com rigor normativo absoluto e zero margem para falhas.</p>
+      <p class="hero-transition-sub">Blindamos edificações, vidas e operações críticas com rigor normativo absoluto e
+        zero margem para falhas.</p>
     </div>
   </div>
 
@@ -297,17 +286,17 @@
     </div>
 
     <div class="hero-big-wrap">
-      <div class="hero-pill-badge" data-parallax="-15">
+      <div class="hero-pill-badge">
         <span class="hero-pill-dot"></span>
         <span class="hero-pill-text">ENGENHARIA DE INCÊNDIO DE ALTA PERFORMANCE</span>
         <span class="hero-pill-dot"></span>
       </div>
 
-      <h1 class="hero-big-title" data-parallax="-10">
+      <h1 class="hero-big-title">
         SEGURANÇA & PRECISÃO EM ENGENHARIA DE INCÊNDIO
       </h1>
 
-      <div class="hero-big-footer" data-parallax="-2">
+      <div class="hero-big-footer">
         <p class="hero-sub">
           Projetamos, executamos e certificamos sistemas de proteção contra incêndio com rigor técnico absoluto —
           protegendo vidas, patrimônio e operações em cada detalhe normativo.
@@ -325,7 +314,7 @@
       </div>
     </div>
 
-    <div class="scroll-indicator" data-parallax="-12">
+    <div class="scroll-indicator" aria-hidden="true">
       <div class="mouse"></div>
     </div>
   </section>
@@ -333,7 +322,7 @@
   <!-- ==========================================================================
      SOBRE
      ========================================================================== -->
-  <section id="sobre" data-parallax="5">
+  <section id="sobre">
     <div class="container">
 
       <div class="sobre-intro-grid">
@@ -344,13 +333,17 @@
             <span class="bucks-dot"></span>
           </div>
           <h2>EXCELÊNCIA EM <span class="gold-gradient-text">CADA PROJETO</span></h2>
-          <p class="sobre-text-trigger">Combinamos know-how técnico de alto nível, engenharia de precisão e as mais rigorosas normas internacionais de segurança para entregar sistemas de proteção contra incêndio sem concessões. Cada centímetro do seu projeto é planejado para blindar vidas, salvaguardar patrimônios históricos e industriais e assegurar a continuidade operacional do seu negócio.</p>
-          
+          <p class="sobre-text-trigger">Combinamos know-how técnico de alto nível, engenharia de precisão e as mais
+            rigorosas normas internacionais de segurança para entregar sistemas de proteção contra incêndio sem
+            concessões. Cada centímetro do seu projeto é planejado para blindar vidas, salvaguardar patrimônios
+            históricos e industriais e assegurar a continuidade operacional do seu negócio.</p>
+
           <div class="sobre-actions">
             <a href="#servicos" class="btn-gold-sm">
               <span>Nossas Especialidades</span>
               <svg viewBox="0 0 24 24" fill="none" width="14" height="14">
-                <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round" />
               </svg>
             </a>
             <div class="sobre-cert-tag">
@@ -420,7 +413,8 @@
             <span class="diff-index">01 // NORMATIVA</span>
           </div>
           <h3>Conformidade Normativa</h3>
-          <p>Projetos 100% alinhados às NBRs, Instruções Técnicas do Corpo de Bombeiros e padrões NFPA com zero margem para reprovação.</p>
+          <p>Projetos 100% alinhados às NBRs, Instruções Técnicas do Corpo de Bombeiros e padrões NFPA com zero margem
+            para reprovação.</p>
         </div>
 
         <div class="diff-card reveal" data-reveal>
@@ -435,7 +429,8 @@
             <span class="diff-index">02 // AGILIDADE</span>
           </div>
           <h3>Resposta Ágil & Prazos</h3>
-          <p>Engenharia dedicada, cronogramas milimétricos e assessoria técnica contínua para desembaraço veloz de alvarás e licenças críticas.</p>
+          <p>Engenharia dedicada, cronogramas milimétricos e assessoria técnica contínua para desembaraço veloz de
+            alvarás e licenças críticas.</p>
         </div>
 
         <div class="diff-card reveal" data-reveal>
@@ -449,7 +444,8 @@
             <span class="diff-index">03 // PRECISÃO</span>
           </div>
           <h3>Engenharia de Precisão</h3>
-          <p>Modelagens hidráulicas avançadas, dimensionamento de perda de carga e memoriais descritivos validados por engenheiros seniores.</p>
+          <p>Modelagens hidráulicas avançadas, dimensionamento de perda de carga e memoriais descritivos validados por
+            engenheiros seniores.</p>
         </div>
       </div>
     </div>
@@ -483,7 +479,8 @@
           </div>
           <div class="service-body">
             <h3>Projetos de Combate a Incêndio</h3>
-            <p>Dimensionamento completo de hidrantes, sistemas de sprinklers automáticos, bombas e redes de detecção precoce de fumaça.</p>
+            <p>Dimensionamento completo de hidrantes, sistemas de sprinklers automáticos, bombas e redes de detecção
+              precoce de fumaça.</p>
             <a href="#contato" class="bucks-link service-bucks-link">
               <span>Solicitar Projeto</span>
               <svg viewBox="0 0 24 24" fill="none">
@@ -506,7 +503,8 @@
           </div>
           <div class="service-body">
             <h3>Laudos Técnicos e AVCB</h3>
-            <p>Emissão de laudos periciais de conformidade, planos de emergência e assessoria completa para obtenção e renovação de AVCB/CLCB.</p>
+            <p>Emissão de laudos periciais de conformidade, planos de emergência e assessoria completa para obtenção e
+              renovação de AVCB/CLCB.</p>
             <a href="#contato" class="bucks-link service-bucks-link">
               <span>Solicitar Laudo</span>
               <svg viewBox="0 0 24 24" fill="none">
@@ -529,7 +527,8 @@
           </div>
           <div class="service-body">
             <h3>Manutenção Preventiva & 24h</h3>
-            <p>Contratos contínuos de conservação técnica, testes de estanqueidade, calibração de válvulas e plantão de suporte operacional.</p>
+            <p>Contratos contínuos de conservação técnica, testes de estanqueidade, calibração de válvulas e plantão de
+              suporte operacional.</p>
             <a href="#contato" class="bucks-link service-bucks-link">
               <span>Ver Planos</span>
               <svg viewBox="0 0 24 24" fill="none">
@@ -564,9 +563,12 @@
         <!-- SVG Curved Dashed Ruler Track (Identical to Buck's Sauce True Circular Wheel) -->
         <div class="bucks-rail-wrap" aria-hidden="true">
           <svg class="bucks-rail-svg" viewBox="0 0 2400 600" fill="none" preserveAspectRatio="none">
-            <path class="bucks-rail-glow" d="M 0 520 A 2000 2000 0 0 1 2400 520" stroke="rgba(200, 164, 107, 0.22)" stroke-width="3" />
-            <path class="bucks-rail-ticks" d="M 0 520 A 2000 2000 0 0 1 2400 520" stroke="#F5E4C7" stroke-width="1.8" stroke-dasharray="3 16" opacity="0.5" />
-            <path class="bucks-rail-major" d="M 0 520 A 2000 2000 0 0 1 2400 520" stroke="#F5E4C7" stroke-width="5" stroke-dasharray="1 44" opacity="0.8" />
+            <path class="bucks-rail-glow" d="M 0 520 A 2000 2000 0 0 1 2400 520" stroke="rgba(200, 164, 107, 0.22)"
+              stroke-width="3" />
+            <path class="bucks-rail-ticks" d="M 0 520 A 2000 2000 0 0 1 2400 520" stroke="#F5E4C7" stroke-width="1.8"
+              stroke-dasharray="3 16" opacity="0.5" />
+            <path class="bucks-rail-major" d="M 0 520 A 2000 2000 0 0 1 2400 520" stroke="#F5E4C7" stroke-width="5"
+              stroke-dasharray="1 44" opacity="0.8" />
           </svg>
         </div>
 
@@ -584,11 +586,15 @@
                 <span class="bucks-dot"></span>
               </div>
               <p class="bucks-copy">
-                Engenharia de precisão para 40.000m² de planta fabril. Sistema integrado de hidrantes de alta vazão, rede de sprinklers automáticos e proteção total para áreas de alto risco térmico.
+                Engenharia de precisão para 40.000m² de planta fabril. Sistema integrado de hidrantes de alta vazão,
+                rede de sprinklers automáticos e proteção total para áreas de alto risco térmico.
               </p>
               <a href="#contato" class="bucks-link">
                 <span>Falar com o Técnico</span>
-                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               </a>
             </div>
           </div>
@@ -605,11 +611,15 @@
                 <span class="bucks-dot"></span>
               </div>
               <p class="bucks-copy">
-                32 pavimentos corporativos protegidos com inteligência. Redes endereçáveis de detecção precoce, pressurização de escadas e controle de fumaça com zero falhas operacionais.
+                32 pavimentos corporativos protegidos com inteligência. Redes endereçáveis de detecção precoce,
+                pressurização de escadas e controle de fumaça com zero falhas operacionais.
               </p>
               <a href="#contato" class="bucks-link">
                 <span>Falar com o Técnico</span>
-                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               </a>
             </div>
           </div>
@@ -626,11 +636,15 @@
                 <span class="bucks-dot"></span>
               </div>
               <p class="bucks-copy">
-                Operação crítica ininterrupta em galpão de 60.000m². Conformidade rigorosa com normas estaduais e internacionais, AVCB expedido e monitoramento contínuo 24/7.
+                Operação crítica ininterrupta em galpão de 60.000m². Conformidade rigorosa com normas estaduais e
+                internacionais, AVCB expedido e monitoramento contínuo 24/7.
               </p>
               <a href="#contato" class="bucks-link">
                 <span>Falar com o Técnico</span>
-                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               </a>
             </div>
           </div>
@@ -647,11 +661,15 @@
                 <span class="bucks-dot"></span>
               </div>
               <p class="bucks-copy">
-                Ambientes de missão crítica com supressão por gás limpo (FM-200 / Novec 1230). Extinção ultrarrápida sem água ou resíduos para proteção total de servidores vitais.
+                Ambientes de missão crítica com supressão por gás limpo (FM-200 / Novec 1230). Extinção ultrarrápida sem
+                água ou resíduos para proteção total de servidores vitais.
               </p>
               <a href="#contato" class="bucks-link">
                 <span>Falar com o Técnico</span>
-                <svg viewBox="0 0 24 24" fill="none"><path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12H19M19 12L13 6M19 12L13 18" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
               </a>
             </div>
           </div>
@@ -667,37 +685,27 @@
 
     <!-- CTA Section -->
     <section class="cta-strip" id="ctaSection">
-      <!-- Palco 3D Full-Screen do Extintor (Zero cortes / Sem div limitante) -->
+      <!-- Palco 3D Full-Screen do Extintor (sem cortes de container e sem círculo vermelho) -->
       <div class="cta-extintor-stage" id="ctaExtintorStage">
-        <div class="extintor-glow-halo"></div>
-        <model-viewer id="extintorModel" src="glb/extintor.glb" alt="Extintor de incêndio Extinmais" 
-          camera-controls disable-zoom interaction-prompt="none" shadow-intensity="0" exposure="1.05" 
-          camera-orbit="8deg 82deg 200%" max-camera-orbit="infinity 180deg 400%" min-camera-orbit="auto auto 5%"
-          camera-target="0m 0.10m 0m" field-of-view="48deg" max-field-of-view="120deg" min-field-of-view="5deg"
-          style="--poster-color: transparent;" loading="lazy" power-preference="low-power" touch-action="pan-y">
+        <div class="extintor-glow-halo" id="extintorHalo"></div>
+        <model-viewer id="extintorModel" src="glb/extintor.glb" alt="Extintor de incêndio Extinmais" camera-controls
+          disable-zoom interaction-prompt="none" shadow-intensity="0" exposure="1.05" camera-orbit="0deg 84deg 310%"
+          max-camera-orbit="infinity 180deg 500%" min-camera-orbit="auto auto 1%" camera-target="0m 0m 0m"
+          field-of-view="46deg" max-field-of-view="65deg" min-field-of-view="1deg" style="--poster-color: transparent;"
+          loading="eager" reveal="auto" touch-action="pan-y">
         </model-viewer>
-        <div class="extintor-cover-veil" id="extintorCoverVeil"></div>
       </div>
 
       <div class="container cta-container">
         <div class="cta-content-top">
-          <div class="bucks-pill" style="margin-bottom: 18px;">
+          <div class="bucks-pill" style="margin-bottom: 12px;">
             <span class="bucks-dot"></span>
             <span class="bucks-pill-label">ATENDIMENTO ESPECIALIZADO</span>
             <span class="bucks-dot"></span>
           </div>
           <h2>Segurança contra incêndio não é <span>opcional</span>. É engenharia.</h2>
-          <p class="cta-desc">Fale com nossa equipe técnica e receba uma avaliação preliminar do seu projeto ou edificação.</p>
-        </div>
-
-        <!-- Indicador Elegante de Continuidade de Conteúdo -->
-        <div class="footer-continuation-indicator" id="footerIndicator">
-          <span>Explore o Contato</span>
-          <div class="indicator-arrow">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M12 5V19M12 19L6 13M12 19L18 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
+          <p class="cta-desc">Fale com nossa equipe técnica e receba uma avaliação preliminar do seu projeto ou
+            edificação.</p>
         </div>
 
         <div class="cta-content-bottom">
@@ -726,8 +734,8 @@
       <div class="container footer-content-inner">
         <!-- Barra de Ação Rápida WhatsApp para Mobile -->
         <div class="footer-mobile-wa-bar">
-          <a href="https://wa.me/551140028922?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Extinmais%20e%20gostaria%20de%20falar%20com%20um%20t%C3%A9cnico." 
-             target="_blank" rel="noopener noreferrer" class="footer-mobile-wa-btn">
+          <a href="https://wa.me/551140028922?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Extinmais%20e%20gostaria%20de%20falar%20com%20um%20t%C3%A9cnico."
+            target="_blank" rel="noopener noreferrer" class="footer-mobile-wa-btn">
             <span class="wa-live-dot"></span>
             <span class="wa-btn-text">Falar com Técnico no WhatsApp</span>
             <span class="wa-num-chip">(11) 4002-8922</span>
@@ -740,7 +748,8 @@
               <img src="img/s.png" alt="Extinmais" class="logo-mark">
               <span class="logo-text">EXTIN<span>MAIS</span></span>
             </a>
-            <p>Engenharia de incêndio com segurança, precisão e conformidade normativa em cada projeto que assinamos.</p>
+            <p>Engenharia de incêndio com segurança, precisão e conformidade normativa em cada projeto que assinamos.
+            </p>
             <div class="social-row">
               <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none">
                   <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.6" />
@@ -752,8 +761,9 @@
                   <path d="M7 10V17M7 7V7.01M12 17V13C12 11.5 13 10.5 14.5 10.5C16 10.5 17 11.5 17 13V17M12 10V17"
                     stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
                 </svg></a>
-              <a href="https://wa.me/551140028922?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Extinmais%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento." 
-                 target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="social-link-wa"><svg viewBox="0 0 24 24" fill="none">
+              <a href="https://wa.me/551140028922?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Extinmais%20e%20gostaria%20de%20solicitar%20um%20or%C3%A7amento."
+                target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="social-link-wa"><svg
+                  viewBox="0 0 24 24" fill="none">
                   <path
                     d="M12 3C7 3 3 7 3 12C3 13.6 3.4 15.1 4.2 16.4L3 21L7.7 19.8C9 20.5 10.5 21 12 21C17 21 21 17 21 12C21 7 17 3 12 3Z"
                     stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
@@ -777,7 +787,9 @@
             <h4>Contato</h4>
             <ul>
               <li>Av. Engenheiro Luís Carlos Berrini, 1500 — São Paulo, SP</li>
-              <li><a href="https://wa.me/551140028922?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Extinmais." target="_blank" rel="noopener noreferrer" class="footer-wa-direct"><span class="wa-dot"></span> WhatsApp: (11) 4002-8922</a></li>
+              <li><a href="https://wa.me/551140028922?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Extinmais."
+                  target="_blank" rel="noopener noreferrer" class="footer-wa-direct"><span class="wa-dot"></span>
+                  WhatsApp: (11) 4002-8922</a></li>
               <li><a href="tel:+551140028922">Telefone: (11) 4002-8922</a></li>
               <li><a href="mailto:contato@extinmais.com.br">contato@extinmais.com.br</a></li>
             </ul>
@@ -805,8 +817,9 @@
   </div>
 
   <!-- WhatsApp Floating Action Button (FAB) -->
-  <a href="https://wa.me/551140028922?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Extinmais%20e%20gostaria%20de%20falar%20com%20um%20t%C3%A9cnico." 
-     target="_blank" rel="noopener noreferrer" class="whatsapp-fab" id="whatsappFab" aria-label="Fale com nosso técnico no WhatsApp">
+  <a href="https://wa.me/551140028922?text=Ol%C3%A1!%20Vim%20pelo%20site%20da%20Extinmais%20e%20gostaria%20de%20falar%20com%20um%20t%C3%A9cnico."
+    target="_blank" rel="noopener noreferrer" class="whatsapp-fab" id="whatsappFab"
+    aria-label="Fale com nosso técnico no WhatsApp">
     <div class="whatsapp-pulse"></div>
     <div class="whatsapp-tooltip">
       <div class="tooltip-header">
@@ -817,7 +830,8 @@
     </div>
     <div class="whatsapp-btn-inner">
       <svg viewBox="0 0 24 24" width="30" height="30" fill="#FFFFFF" class="whatsapp-svg-icon">
-        <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.23 8.23 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.12-.14.17-.25.25-.42.08-.17.04-.32-.02-.45-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.12.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.17-.48-.29"/>
+        <path
+          d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.23 8.23 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.12-.14.17-.25.25-.42.08-.17.04-.32-.02-.45-.06-.13-.56-1.35-.77-1.85-.2-.49-.41-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.12.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.43.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.17-.48-.29" />
       </svg>
     </div>
   </a>
