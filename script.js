@@ -773,10 +773,10 @@
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: section,
-        start: "center center",
-        end: () => isMobile ? "+=260%" : "+=320%",
+        start: "top top",
+        end: () => isMobile ? "+=250%" : "+=320%",
         pin: true,
-        scrub: 0.6,
+        scrub: isMobile ? 0.5 : 0.6,
         anticipatePin: 1,
         invalidateOnRefresh: true
       }
@@ -811,9 +811,9 @@
     // Inicialização: Footer 100% invisível até o extintor preencher toda a tela
     gsap.set(footer, { opacity: 0, pointerEvents: 'none', visibility: 'hidden' });
 
-    const initialOrbitRadius = isMobile ? 350 : 320;
-    const initialFov = isMobile ? 50 : 46;
-    const restingY = isMobile ? 28 : 34;
+    const initialOrbitRadius = isMobile ? 395 : 320;
+    const initialFov = isMobile ? 52 : 46;
+    const restingY = isMobile ? Math.round(window.innerHeight * 0.11 + 34) : 34;
 
     let cameraState = {
       theta: 0,
@@ -824,7 +824,7 @@
     if (mv) {
       mv.cameraOrbit = `0deg 84deg ${initialOrbitRadius}%`;
       mv.fieldOfView = `${initialFov}deg`;
-      mv.cameraTarget = `0m 0m 0m`;
+      mv.cameraTarget = isMobile ? '0m 0.06m 0m' : '0m 0m 0m';
     }
 
     if (stage) {
