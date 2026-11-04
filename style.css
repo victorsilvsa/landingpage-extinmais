@@ -1507,6 +1507,7 @@ section {
   inset: 0;
   width: 100%;
   height: 100%;
+  transform: translateY(clamp(32px, 5.5vh, 56px));
   z-index: 11;
   pointer-events: none;
   display: flex;
@@ -2035,6 +2036,7 @@ footer#contato {
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
+    transform: translateY(clamp(24px, 4.8vh, 44px)) !important;
     max-height: none !important;
     margin: 0 !important;
     z-index: 11 !important;

@@ -623,11 +623,11 @@
       // Footer begins hidden behind the 3D extintor stage
       gsap.set(footer, { opacity: 0, pointerEvents: 'none', visibility: 'hidden' });
 
-      // Initial responsive 3D camera settings
-      const initialRadius = Hardware.isMobile ? 350 : 320;
-      const initialFov = Hardware.isMobile ? 50 : 46;
-      const targetRadius = Hardware.isMobile ? 16 : 12;
-      const targetFov = Hardware.isMobile ? 5 : 4;
+      // Initial responsive 3D camera settings (Golden ratio balance - no text collision)
+      const initialRadius = Hardware.isMobile ? 600 : 580;
+      const initialFov = Hardware.isMobile ? 44 : 42;
+      const targetRadius = Hardware.isMobile ? 18 : 14;
+      const targetFov = Hardware.isMobile ? 6 : 5;
 
       const cam = { theta: 0, radius: initialRadius, fov: initialFov };
       if (mv) {
@@ -654,6 +654,10 @@
       tl.to('.cta-content-top', { opacity: 0, y: -24, duration: 0.22 }, 0)
         .to('.cta-content-bottom', { opacity: 0, y: 24, duration: 0.22 }, 0)
         .to('#extintorHalo', { opacity: 0, duration: 0.2 }, 0);
+
+      if (stage) {
+        tl.to(stage, { y: 0, duration: 0.6, ease: 'power2.out' }, 0);
+      }
 
       if (mv) {
         tl.to(cam, {
