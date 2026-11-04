@@ -646,6 +646,7 @@ header.scrolled {
   align-items: center;
   padding-top: var(--header-h);
   overflow: hidden;
+  background: var(--black);
 }
 
 .hero--video {

@@ -176,9 +176,21 @@
       }
     }
 
-    function updateTarget(scrollY, maxScroll) {
+        function updateTarget(scrollY, maxScroll) {
       if (maxScroll <= 0) return;
-      const progress = Math.max(0, Math.min(1, scrollY / maxScroll));
+      const hero = document.getElementById('hero');
+      // While inside hero pinned transition, keep canvas locked on frame 0
+      const heroThreshold = hero ? (hero.offsetHeight * 1.15) : window.innerHeight;
+      if (scrollY <= heroThreshold) {
+        if (targetFrame !== 0) {
+          targetFrame = 0;
+          requestTick();
+        }
+        return;
+      }
+      const effectiveY = scrollY - heroThreshold;
+      const effectiveMax = Math.max(1, maxScroll - heroThreshold);
+      const progress = Math.max(0, Math.min(1, effectiveY / effectiveMax));
       const newTarget = progress * (totalFrames - 1);
       if (Math.abs(newTarget - targetFrame) > 0.1) {
         targetFrame = newTarget;
@@ -395,7 +407,7 @@
       maxScroll = Math.max(1, docH - winH);
     }
 
-            // 4.1 Hero Curtain & Transition Text (Active on Both Desktop & Mobile, 100% Solid Black, Zero Ghosting)
+                // 4.1 Hero Curtain & Transition Text (Seamless Transition to #sobre, Solid Black, Zero Premature Body Reveals)
     function initHeroTransition() {
       const hero = document.getElementById('hero');
       const curtain = document.getElementById('heroCurtain');
@@ -421,40 +433,34 @@
       tl.to('.hero-big-wrap, .scroll-indicator', {
         opacity: 0,
         y: isMob ? -20 : -30,
-        duration: 0.25,
+        duration: 0.22,
         ease: 'power1.out'
       }, 0)
-      // Phase 2: Curtain steps cascade down smoothly
+      // Phase 2: Curtain steps cascade down smoothly to solid black (#080808)
       .to(steps, {
         scaleY: 1,
         stagger: isMob ? 0.015 : 0.02,
         ease: 'power2.inOut',
-        duration: 0.45,
+        duration: 0.40,
         transformOrigin: 'top center'
-      }, 0.08)
+      }, 0.06)
       // ZERO GHOSTING: hero image fades completely to 0 (100% pitch black solid background)
-      .to(videoWrap, { opacity: 0, duration: 0.28, ease: 'power1.out' }, 0.12)
+      .to(videoWrap, { opacity: 0, duration: 0.24, ease: 'power1.out' }, 0.10)
       // Phase 3: Transition text reveals with authority against solid pure black
-      .set(transitionText, { visibility: 'visible' }, 0.42)
-      .to(transitionText, { opacity: 1, duration: 0.22 }, 0.42)
-      .to(title, { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' }, 0.46)
-      .to(sub, { opacity: 1, y: 0, duration: 0.24, ease: 'power2.out' }, 0.50)
+      .set(transitionText, { visibility: 'visible' }, 0.38)
+      .to(transitionText, { opacity: 1, duration: 0.22 }, 0.38)
+      .to(title, { opacity: 1, y: 0, duration: 0.26, ease: 'power2.out' }, 0.42)
+      .to(sub, { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out' }, 0.46)
       // Pause to comfortably read the message
-      .to({}, { duration: isMob ? 0.25 : 0.35 })
-      // Phase 4: Clean dissolve and curtain exit
-      .to(transitionText, { opacity: 0, y: -16, duration: 0.22, ease: 'power2.in' })
-      .to(steps, {
-        scaleY: 0,
-        transformOrigin: 'bottom center',
-        stagger: isMob ? 0.015 : 0.02,
-        ease: 'power2.inOut',
-        duration: 0.45
-      });
+      .to({}, { duration: isMob ? 0.30 : 0.40 })
+      // Phase 4: Clean dissolve of transition text ONLY (curtain stays solid black so body never shows through!)
+      .to(transitionText, { opacity: 0, y: -20, duration: 0.22, ease: 'power2.in' })
+      .to({}, { duration: 0.12 });
 
       ScrollTrigger.create({
         trigger: hero,
         start: 'top top',
-        end: isMob ? '+=110%' : '+=125%',
+        end: isMob ? '+=100%' : '+=115%',
         pin: true,
         pinSpacing: true,
         scrub: isMob ? 0.35 : 0.5,
@@ -650,7 +656,7 @@
       });
     }
 
-        // 4.5 CTA Strip & 3D Extintor Transition (Spinning, Zooming to 100% Screen & Seamless Footer)
+            // 4.5 CTA Strip & 3D Extintor Transition (Spinning, Zooming to 100% Screen & Seamless Footer)
     function initCtaTransition() {
       const group = document.getElementById('ctaFooterGroup');
       const footer = document.getElementById('contato');
@@ -679,8 +685,16 @@
       mv.cameraTarget = `0m ${startTargetY.toFixed(2)}m 0m`;
       mv.fieldOfView = `${startFov}deg`;
       gsap.set(mv, { scale: 1 });
-      if (typeof mv.jumpCameraToGoal === 'function') {
+
+      // Safe camera snap once model is fully loaded in memory (prevents rAF timeout in updateSource)
+      if (mv.loaded && typeof mv.jumpCameraToGoal === 'function') {
         mv.jumpCameraToGoal();
+      } else {
+        mv.addEventListener('load', () => {
+          if (typeof mv.jumpCameraToGoal === 'function') {
+            mv.jumpCameraToGoal();
+          }
+        }, { once: true });
       }
 
       const pinDistance = isMob ? '+=140%' : '+=160%';
@@ -722,7 +736,7 @@
           mv.cameraOrbit = `${cam.theta.toFixed(1)}deg 84deg ${cam.radius.toFixed(1)}%`;
           mv.cameraTarget = `0m ${cam.targetY.toFixed(2)}m 0m`;
           mv.fieldOfView = `${cam.fov.toFixed(1)}deg`;
-          if (typeof mv.jumpCameraToGoal === 'function') {
+          if (mv.loaded && typeof mv.jumpCameraToGoal === 'function') {
             mv.jumpCameraToGoal();
           }
         }
