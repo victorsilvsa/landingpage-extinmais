@@ -625,26 +625,36 @@
       .to({}, { duration: 0.25 });
     }
 
-        // 4.5 CTA Strip & 3D Extintor Transition (Full Cinematic Zoom on Mobile & Desktop)
+            // 4.5 CTA Strip & 3D Extintor Transition (Spinning, Approaching & Covering Screen)
     function initCtaTransition() {
       const group = document.getElementById('ctaFooterGroup');
       const footer = document.getElementById('contato');
       const mv = document.getElementById('extintorModel');
       const stage = document.getElementById('ctaExtintorStage');
-      if (!group || !footer) return;
+      if (!group || !footer || !mv) return;
 
       // Footer begins hidden behind the 3D extintor stage
       gsap.set(footer, { opacity: 0, pointerEvents: 'none', visibility: 'hidden' });
+      if (stage) gsap.set(stage, { opacity: 1, visibility: 'visible' });
 
-      // Initial clean camera settings
-      if (mv) {
-        mv.cameraOrbit = '0deg 84deg 105%';
-        mv.fieldOfView = '45deg';
-        gsap.set(mv, { scale: 1 });
-      }
+      // Start state: extintor sits comfortably in center, below text and above button
+      const startRadius = Hardware.isMobile ? 520 : 480;
+      const startTargetY = Hardware.isMobile ? 0.25 : 0.28;
+      const startFov = 45;
 
-      const pinDistance = Hardware.isMobile ? '+=120%' : '+=130%';
-      const scrubSpeed = Hardware.isMobile ? 0.35 : 0.5;
+      const cam = {
+        theta: 0,
+        radius: startRadius,
+        targetY: startTargetY,
+        fov: startFov
+      };
+
+      mv.cameraOrbit = `0deg 84deg ${startRadius}%`;
+      mv.cameraTarget = `0m ${startTargetY.toFixed(2)}m 0m`;
+      mv.fieldOfView = `${startFov}deg`;
+
+      const pinDistance = Hardware.isMobile ? '+=150%' : '+=160%';
+      const scrubSpeed = Hardware.isMobile ? 0.4 : 0.5;
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -659,26 +669,36 @@
         }
       });
 
-      // 1. CTA Text and halo fade out cleanly
-      tl.to('.cta-content-top', { opacity: 0, y: -24, duration: 0.25, ease: 'power1.out' }, 0)
-        .to('.cta-content-bottom', { opacity: 0, y: 24, duration: 0.25, ease: 'power1.out' }, 0)
-        .to('#extintorHalo', { opacity: 0, duration: 0.25 }, 0);
+      // 1. CTA Text and halo fade out cleanly as scroll starts
+      tl.to('.cta-content-top', { opacity: 0, y: -24, duration: 0.22, ease: 'power1.out' }, 0)
+        .to('.cta-content-bottom', { opacity: 0, y: 24, duration: 0.22, ease: 'power1.out' }, 0)
+        .to('#extintorHalo', { opacity: 0, duration: 0.22 }, 0);
 
-      // 2. Extinguisher approaches the viewer (zooming smoothly into camera)
-      if (mv) {
-        tl.to(mv, {
-          scale: Hardware.isMobile ? 2.8 : 3.4,
-          duration: 0.72,
-          ease: 'power2.in'
-        }, 0.05);
-      }
+      // 2. Extinguisher ROTATES and APPROACHES the screen (zooming to COVER THE WHOLE SCREEN)
+      // theta: 0 -> 240 deg (spins dynamically in 3D)
+      // radius: 480% -> 10% (rushes directly toward camera)
+      // fov: 45deg -> 3.5deg (super zoom: red cylinder completely covers screen)
+      // targetY: 0.28m -> 0m (smoothly centers onto red body)
+      tl.to(cam, {
+        theta: 240,
+        radius: 10,
+        fov: 3.5,
+        targetY: 0,
+        duration: 0.72,
+        ease: 'power2.in',
+        onUpdate: () => {
+          mv.cameraOrbit = `${cam.theta.toFixed(1)}deg 84deg ${cam.radius.toFixed(1)}%`;
+          mv.cameraTarget = `0m ${cam.targetY.toFixed(2)}m 0m`;
+          mv.fieldOfView = `${cam.fov.toFixed(1)}deg`;
+        }
+      }, 0.02);
 
-      // 3. Stage dissolves smoothly at peak approach
+      // 3. Stage dissolves smoothly as the red body covers the whole viewport
       if (stage) {
-        tl.to(stage, { opacity: 0, duration: 0.2, ease: 'power1.out' }, 0.70);
+        tl.to(stage, { opacity: 0, duration: 0.18, ease: 'power1.out' }, 0.70);
       }
 
-      // 4. Footer dissolves in seamlessly
+      // 4. Unified footer dissolves in seamlessly with video background and interactive channels
       tl.fromTo(footer,
         { opacity: 0, visibility: 'hidden', pointerEvents: 'none' },
         { opacity: 1, visibility: 'visible', pointerEvents: 'auto', duration: 0.25, ease: 'power2.out' },

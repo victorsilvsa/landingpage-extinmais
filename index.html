@@ -62,7 +62,7 @@
   <!-- model-viewer (Google) — Carregamento assíncrono não-bloqueante -->
   <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
 
-  <link rel="stylesheet" href="style.css?v=20261104-301">
+  <link rel="stylesheet" href="style.css?v=20261104-320">
 </head>
 
 <body>
@@ -261,31 +261,27 @@
   </div>
 
   <!-- ==========================================================================
-     ELEMENTOS DE TRANSIÇÃO (Mantidos no topo para evitar quebras de empilhamento)
-     ========================================================================== -->
-  <div class="hero-curtain" id="heroCurtain">
-    <div class="curtain-step"></div>
-    <div class="curtain-step"></div>
-    <div class="curtain-step"></div>
-    <div class="curtain-step"></div>
-    <div class="curtain-step"></div>
-    <div class="curtain-step"></div>
-    <div class="curtain-step"></div>
-    <div class="curtain-step"></div>
-  </div>
-
-  <div class="hero-transition-text" id="heroTransitionText">
-    <div class="hero-transition-inner">
-      <h2 class="letter-reveal-target">SEGURANÇA NÃO É OPÇÃO.<br>É PRECISÃO MATEMÁTICA.</h2>
-      <p class="hero-transition-sub">Blindamos edificações, vidas e operações críticas com rigor normativo absoluto e
-        zero margem para falhas.</p>
-    </div>
-  </div>
-
-  <!-- ==========================================================================
      HERO
      ========================================================================== -->
   <section class="hero hero--video" id="hero">
+    <div class="hero-curtain" id="heroCurtain">
+      <div class="curtain-step"></div>
+      <div class="curtain-step"></div>
+      <div class="curtain-step"></div>
+      <div class="curtain-step"></div>
+      <div class="curtain-step"></div>
+      <div class="curtain-step"></div>
+      <div class="curtain-step"></div>
+      <div class="curtain-step"></div>
+    </div>
+
+    <div class="hero-transition-text" id="heroTransitionText">
+      <div class="hero-transition-inner">
+        <h2 class="letter-reveal-target">SEGURANÇA NÃO É OPÇÃO.<br>É PRECISÃO MATEMÁTICA.</h2>
+        <p class="hero-transition-sub">Blindamos edificações, vidas e operações críticas com rigor normativo absoluto e
+          zero margem para falhas.</p>
+      </div>
+    </div>
     <div class="hero-video-wrap">
       <img class="hero-video" src="img/hero.png" alt="Extinmais">
       <div class="hero-video-overlay"></div>
@@ -645,8 +641,15 @@
       <div class="cta-extintor-stage" id="ctaExtintorStage">
         <div class="extintor-glow-halo" id="extintorHalo"></div>
         <model-viewer id="extintorModel" src="glb/extintor.glb" alt="Extintor de incêndio Extinmais"
-          interaction-prompt="none" shadow-intensity="0" exposure="1.05" camera-orbit="0deg 84deg 105%"
-          camera-target="0m 0m 0m" field-of-view="45deg" style="--poster-color: transparent;"
+          interaction-prompt="none" shadow-intensity="0" exposure="1.05"
+          camera-orbit="0deg 84deg 480%"
+          camera-target="0m 0.28m 0m"
+          field-of-view="45deg"
+          min-field-of-view="1deg"
+          max-field-of-view="65deg"
+          min-camera-orbit="auto auto 1%"
+          max-camera-orbit="infinity 180deg 1000%"
+          style="--poster-color: transparent;"
           loading="eager" reveal="auto">
         </model-viewer>
       </div>
@@ -793,7 +796,7 @@
     </svg>
   </button>
 
-  <script src="script.js?v=20261104-301"></script>
+  <script src="script.js?v=20261104-320"></script>
 </body>
 
 </html>

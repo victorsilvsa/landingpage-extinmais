@@ -678,12 +678,11 @@ header.scrolled {
 }
 
 .hero-curtain {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 850;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 20;
   display: flex;
   pointer-events: none;
   overflow: hidden;
@@ -700,12 +699,11 @@ header.scrolled {
 }
 
 .hero-transition-text {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  z-index: 860;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 25;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -1529,15 +1527,14 @@ section {
 }
 
 .cta-extintor-stage model-viewer {
-  position: relative;
-  width: min(340px, 80vw);
-  height: clamp(260px, 42vh, 400px);
-  max-height: 44vh;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 2;
   --poster-color: transparent;
   background: transparent;
-  will-change: transform, opacity;
 }
 
 /* ==========================================================================
@@ -2047,11 +2044,12 @@ footer#contato {
   }
 
   .cta-extintor-stage model-viewer {
-    width: min(270px, 75vw) !important;
-    height: clamp(210px, 34vh, 290px) !important;
-    max-height: 36vh !important;
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-height: none !important;
     pointer-events: none !important;
-    will-change: transform, opacity !important;
   }
 
   .cta-content-bottom {
