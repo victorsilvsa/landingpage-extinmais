@@ -266,7 +266,34 @@
       initAnimation();
 
       const state = { val: 0 };
-      const duration = 1.8;
+      const duration = 2.0;
+
+      // 3D Extinguisher Preloading: Eagerly load before preloader finishes
+      let modelReady = false;
+      const mv = document.getElementById('extintorModel');
+
+      const markReady = () => {
+        modelReady = true;
+      };
+
+      if (mv) {
+        if (mv.loaded) {
+          modelReady = true;
+        } else {
+          mv.addEventListener('load', markReady, { once: true });
+          mv.addEventListener('error', markReady, { once: true });
+        }
+      }
+
+      // Also directly preload the GLB binary buffer via fetch into memory
+      fetch('glb/extintor.glb')
+        .then(res => res.blob())
+        .then(() => {
+          modelReady = true;
+        })
+        .catch(() => {
+          modelReady = true;
+        });
 
       const tween = gsap.to(state, {
         val: 100,
@@ -275,15 +302,33 @@
         onUpdate: () => {
           if (percentEl) percentEl.textContent = Math.round(state.val);
         },
-        onComplete: () => dismiss(onCompleteCallback)
+        onComplete: () => {
+          if (modelReady) {
+            dismiss(onCompleteCallback);
+          } else {
+            // Keep at 100% until model finishes, max safety check 3.0s
+            const interval = setInterval(() => {
+              if (modelReady || released) {
+                clearInterval(interval);
+                dismiss(onCompleteCallback);
+              }
+            }, 60);
+            setTimeout(() => {
+              clearInterval(interval);
+              dismiss(onCompleteCallback);
+            }, 3000);
+          }
+        }
       });
 
+      // Safety fallback (maximum 3.8s so preloader never hangs)
       setTimeout(() => {
         if (!released) {
+          modelReady = true;
           tween.progress(1);
           dismiss(onCompleteCallback);
         }
-      }, 2200);
+      }, 3800);
     }
 
     function dismiss(callback) {
@@ -432,7 +477,13 @@
         scrub: 0.6,
         invalidateOnRefresh: true,
         anticipatePin: 1,
-        animation: tl
+        animation: tl,
+        onLeave: () => {
+          gsap.set([curtain, transitionText], { visibility: 'hidden' });
+        },
+        onEnterBack: () => {
+          gsap.set([curtain, transitionText], { visibility: 'visible' });
+        }
       });
     }
 

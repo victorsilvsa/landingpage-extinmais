@@ -646,7 +646,8 @@ header.scrolled {
   align-items: center;
   padding-top: var(--header-h);
   overflow: hidden;
-  background: var(--black);
+  background: transparent;
+  margin-bottom: -100svh;
 }
 
 .hero--video {
@@ -658,7 +659,7 @@ header.scrolled {
   inset: 0;
   z-index: 1;
   overflow: hidden;
-  background: var(--black);
+  background: transparent;
 }
 
 .hero-video {
