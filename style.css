@@ -678,12 +678,14 @@ header.scrolled {
   pointer-events: none;
 }
 
+/* Cortina em degraus verticais (Versao original de ontem restaurada) */
 .hero-curtain {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 20;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 850;
   display: flex;
   pointer-events: none;
   overflow: hidden;
@@ -700,17 +702,19 @@ header.scrolled {
 }
 
 .hero-transition-text {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 25;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 860;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 32px;
   pointer-events: none;
   opacity: 0;
+  box-sizing: border-box;
 }
 
 .hero-transition-inner {
@@ -720,6 +724,31 @@ header.scrolled {
   text-align: center;
   max-width: 960px;
   width: 100%;
+}
+
+.hero-trans-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--cream);
+  color: var(--cream-dark);
+  border-radius: 9999px;
+  padding: 8px 22px;
+  font-family: var(--font-main);
+  font-weight: 800;
+  font-size: clamp(11px, 1vw, 13.5px);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.trans-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cream-dark);
+  flex-shrink: 0;
 }
 
 .hero-transition-text .letter-reveal-target {
@@ -736,13 +765,58 @@ header.scrolled {
 
 .hero-transition-sub {
   font-family: var(--font-main);
-  font-size: clamp(14px, 1.2vw, 17px);
-  color: var(--text-gray);
-  max-width: 600px;
+  font-size: clamp(14px, 1.2vw, 16px);
+  font-weight: 400;
   line-height: 1.6;
+  color: var(--text-gray);
+  max-width: 620px;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 
+/* Componentes do Hero */
 .hero-big-wrap {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 48px);
+  display: flex;
+  flex-direction: column;
+}
+
+.hero-pill-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--cream);
+  color: var(--cream-dark);
+  border-radius: 9999px;
+  padding: 6px 16px;
+  font-family: var(--font-main);
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  width: fit-content;
+  margin-bottom: 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.hero-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cream-dark);
+  flex-shrink: 0;
+}
+
+.hero-pill-text {
+  color: var(--cream-dark);
+}
+
+.hero-big-wrap-legacy {
   position: relative;
   z-index: 10;
   width: 100%;
@@ -2226,6 +2300,29 @@ html.low-perf header.scrolled {
 }
 
 @media (max-width: 940px) {
+    .hero-pill-badge {
+    font-size: clamp(8px, 2.3vw, 9.5px) !important;
+    letter-spacing: 0.04em !important;
+    padding: 6px 12px !important;
+    gap: 6px !important;
+    max-width: calc(100vw - 32px) !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin-bottom: 14px !important;
+  }
+  .hero-pill-dot {
+    width: 4px !important;
+    height: 4px !important;
+  }
+  .hero-trans-pill {
+    padding: 6px 16px !important;
+    font-size: 10px !important;
+    gap: 8px !important;
+    margin-bottom: 16px !important;
+  }
+
   .hero-transition-text {
     padding: 0 20px !important;
   }

@@ -298,6 +298,16 @@
         ease: 'power2.out'
       });
 
+      // Camera push-in on hero to create cinematic visual emergence as curtains part (from yesterday's commit)
+      gsap.fromTo('.hero-video-wrap', 
+        { scale: 1.05 }, 
+        { scale: 1, duration: 0.95, ease: 'power2.out' }
+      );
+      gsap.fromTo('.hero-big-wrap', 
+        { opacity: 0.6, y: 15 }, 
+        { opacity: 1, y: 0, duration: 0.80, ease: 'power2.out', delay: 0.08 }
+      );
+
       const aperture = { top: 50, bot: 50 };
       gsap.to(aperture, {
         top: 0,
@@ -331,73 +341,98 @@
      ========================================================================== */
   const ScrollOrchestrator = (() => {
 
-    // 4.1 Hero Curtain & Transition Text (Seamless, Solid Black, Zero Premature Flashes)
+    // 4.1 Hero Curtain & Transition Text (Exact SOTD implementation from yesterday's commit)
     function initHeroTransition() {
-      const hero = document.getElementById('hero');
+      const hero = document.getElementById('hero') || document.querySelector('.hero');
       const curtain = document.getElementById('heroCurtain');
       const transitionText = document.getElementById('heroTransitionText');
-      const videoWrap = hero ? hero.querySelector('.hero-video-wrap') : null;
+      const pill = transitionText ? transitionText.querySelector('.hero-trans-pill') : null;
+      const title = transitionText ? transitionText.querySelector('.letter-reveal-target') : null;
+      const sub = transitionText ? transitionText.querySelector('.hero-transition-sub') : null;
+
       if (!hero || !curtain || !transitionText) return;
 
-      const isMob = Hardware.isMobile;
       const steps = gsap.utils.toArray('.curtain-step');
-      const title = transitionText.querySelector('.letter-reveal-target');
-      const sub = transitionText.querySelector('.hero-transition-sub');
+      const heroVideoWrap = document.querySelector('.hero-video-wrap');
+      const isMob = window.innerWidth <= 940;
 
-      // Initial clean state
-      gsap.set(steps, { scaleY: 0, transformOrigin: 'top center' });
-      gsap.set(transitionText, { opacity: 0, visibility: 'hidden' });
-      if (title) gsap.set(title, { opacity: 0, y: isMob ? 14 : 20 });
-      if (sub) gsap.set(sub, { opacity: 0, y: isMob ? 10 : 15 });
-      if (videoWrap) gsap.set(videoWrap, { opacity: 1 });
+      gsap.set(steps, { scaleY: 0, yPercent: 0, transformOrigin: 'top center' });
+      gsap.set(transitionText, { opacity: 0, y: 0 });
+      if (pill) gsap.set(pill, { opacity: 0, y: 15 });
+      if (title) gsap.set(title, { opacity: 0, y: 20 });
+      if (sub) gsap.set(sub, { opacity: 0, y: 15 });
+
+      if (heroVideoWrap) {
+        gsap.set(heroVideoWrap, { opacity: 1 });
+      }
 
       const tl = gsap.timeline();
 
-      // Phase 1: Hero content fades and lifts cleanly
+      // 1. Textos e indicadores do hero desaparecem suavemente
       tl.to('.hero-big-wrap, .scroll-indicator', {
         opacity: 0,
-        y: isMob ? -20 : -30,
-        duration: 0.22,
+        y: -25,
+        duration: 0.45,
         ease: 'power1.out'
       }, 0)
-      // Phase 2: Curtain steps cascade down smoothly to solid black (#080808)
+      // 2. Os degraus descem cobrindo COMPLETAMENTE o hero de cima para baixo
       .to(steps, {
         scaleY: 1,
-        stagger: isMob ? 0.015 : 0.02,
+        stagger: 0.035,
         ease: 'power2.inOut',
-        duration: 0.40,
+        duration: 1.0,
         transformOrigin: 'top center'
-      }, 0.06)
-      // ZERO GHOSTING: hero image fades completely to 0 (100% pitch black solid background)
-      .to(videoWrap, { opacity: 0, duration: 0.24, ease: 'power1.out' }, 0.10)
-      // Phase 3: Transition text reveals with authority against solid pure black
-      .set(transitionText, { visibility: 'visible' }, 0.38)
-      .to(transitionText, { opacity: 1, duration: 0.22 }, 0.38)
-      .to(title, { opacity: 1, y: 0, duration: 0.26, ease: 'power2.out' }, 0.42)
-      .to(sub, { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out' }, 0.46)
-      // Pause to comfortably read the message
-      .to({}, { duration: isMob ? 0.25 : 0.35 })
-      // Phase 4: Clean dissolve of transition text (curtain stays solid black so body never shows through!)
-      .to(transitionText, { opacity: 0, y: -20, duration: 0.22, ease: 'power2.in' })
-      .to({}, { duration: 0.10 });
+      }, 0.1)
+      // 3. Suavização da visibilidade do hero sob a cortina
+      .to(heroVideoWrap, { opacity: 0, duration: 0.35, ease: 'none' }, 0.85)
+      // 4. Revela o bloco editorial de transição sobre o fundo preto da cortina
+      .to(transitionText, { opacity: 1, duration: 0.25 }, 1.0)
+      .to(pill, {
+        opacity: 1,
+        y: 0,
+        duration: 0.4,
+        ease: 'power2.out'
+      }, 1.05)
+      .to(title, {
+        opacity: 1,
+        y: 0,
+        duration: 0.5,
+        ease: 'power2.out'
+      }, 1.15)
+      .to(sub, {
+        opacity: 1,
+        y: 0,
+        duration: 0.45,
+        ease: 'power2.out'
+      }, 1.25)
+      // Pausa confortável e estável para leitura
+      .to({}, { duration: 0.9 })
+      // Fade out suave do texto
+      .to(transitionText, {
+        opacity: 0,
+        y: -18,
+        duration: 0.35,
+        ease: 'power2.in'
+      })
+      // 5. A cortina abre suavemente em direção ao fundo
+      .to(steps, {
+        yPercent: 100,
+        stagger: 0.03,
+        ease: 'power2.inOut',
+        duration: 0.95
+      });
 
       ScrollTrigger.create({
         id: 'heroPin',
         trigger: hero,
         start: 'top top',
-        end: isMob ? '+=85%' : '+=95%',
+        end: () => (window.innerWidth <= 940) ? '+=180%' : '+=240%',
         pin: true,
         pinSpacing: true,
-        scrub: isMob ? 0.3 : 0.45,
+        scrub: 0.6,
         invalidateOnRefresh: true,
         anticipatePin: 1,
-        animation: tl,
-        onLeave: () => {
-          gsap.set([curtain, transitionText], { visibility: 'hidden' });
-        },
-        onEnterBack: () => {
-          gsap.set([curtain, transitionText], { visibility: 'visible' });
-        }
+        animation: tl
       });
     }
 
