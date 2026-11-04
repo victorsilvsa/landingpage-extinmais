@@ -557,75 +557,117 @@
       });
     }
 
-    // 4.4 Buck's Sauce Project Showcase
+        // 4.4 Buck's Sauce Project Showcase (Responsive MatchMedia: Desktop Wheel + Mobile Fluid Horizontal Snap)
     function initProjectsShowcase() {
       const section = document.getElementById('projetos');
       const cards = gsap.utils.toArray('.bucks-card');
+      const track = document.getElementById('bucksCardsTrack');
       if (!section || !cards.length) return;
 
-      if (Hardware.isMobile) {
-        // Mobile: Clean horizontal or natural scroll
-        return;
-      }
+      const mm = gsap.matchMedia();
 
-      const R = 1800;
-      const stepAngle = 24;
+      // DESKTOP: True Circular Wheel Radial Showcase (Buck's Sauce caliber)
+      mm.add("(min-width: 941px)", () => {
+        const R = 1800;
+        const stepAngle = 24;
 
-      function setWheel(angle) {
-        cards.forEach((card, i) => {
-          const cardAngle = angle + (i * stepAngle);
-          const absAngle = Math.abs(cardAngle);
-          const rad = (cardAngle * Math.PI) / 180;
-          const x = R * Math.sin(rad);
-          const y = R * (1 - Math.cos(rad)) + Math.pow(absAngle / stepAngle, 1.3) * 36;
-          const rot = cardAngle * 0.45;
+        function setWheel(angle) {
+          cards.forEach((card, i) => {
+            const cardAngle = angle + (i * stepAngle);
+            const absAngle = Math.abs(cardAngle);
+            const rad = (cardAngle * Math.PI) / 180;
+            const x = R * Math.sin(rad);
+            const y = R * (1 - Math.cos(rad)) + Math.pow(absAngle / stepAngle, 1.3) * 36;
+            const rot = cardAngle * 0.45;
 
-          let opacity = 0;
-          let scale = 1;
-          if (absAngle < 5) {
-            opacity = 1;
-          } else if (absAngle < stepAngle * 0.85) {
-            opacity = 1 - ((absAngle - 5) / (stepAngle * 0.85 - 5)) * 0.85;
-            scale = 0.94;
-          } else if (absAngle < stepAngle * 1.25) {
-            opacity = 0.12;
-            scale = 0.88;
-          }
+            let opacity = 0;
+            let scale = 1;
+            if (absAngle < 5) {
+              opacity = 1;
+            } else if (absAngle < stepAngle * 0.85) {
+              opacity = 1 - ((absAngle - 5) / (stepAngle * 0.85 - 5)) * 0.85;
+              scale = 0.94;
+            } else if (absAngle < stepAngle * 1.25) {
+              opacity = 0.12;
+              scale = 0.88;
+            }
 
-          card.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${rot.toFixed(1)}deg) scale(${scale.toFixed(2)})`;
-          card.style.opacity = opacity.toFixed(2);
-          card.style.zIndex = Math.round(100 - absAngle);
-          card.style.pointerEvents = absAngle < 10 ? 'auto' : 'none';
-        });
-      }
-
-      setWheel(0);
-
-      const state = { angle: 0 };
-      const totalAngle = -stepAngle * (cards.length - 1);
-
-      gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: 'top top',
-          end: '+=190%',
-          pin: true,
-          scrub: 0.5,
-          anticipatePin: 1,
-          invalidateOnRefresh: true
+            card.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotate(${rot.toFixed(1)}deg) scale(${scale.toFixed(2)})`;
+            card.style.opacity = opacity.toFixed(2);
+            card.style.zIndex = Math.round(100 - absAngle);
+            card.style.pointerEvents = absAngle < 10 ? 'auto' : 'none';
+          });
         }
-      })
-      .to({}, { duration: 0.25 })
-      .to(state, {
-        angle: totalAngle,
-        duration: 2.2,
-        ease: 'none',
-        onUpdate: () => setWheel(state.angle)
-      })
-      .to({}, { duration: 0.25 });
+
+        setWheel(0);
+
+        const state = { angle: 0 };
+        const totalAngle = -stepAngle * (cards.length - 1);
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: section,
+            start: 'top top',
+            end: '+=190%',
+            pin: true,
+            scrub: 0.5,
+            anticipatePin: 1,
+            invalidateOnRefresh: true
+          }
+        })
+        .to({}, { duration: 0.25 })
+        .to(state, {
+          angle: totalAngle,
+          duration: 2.2,
+          ease: 'none',
+          onUpdate: () => setWheel(state.angle)
+        })
+        .to({}, { duration: 0.25 });
+
+        return () => {
+          cards.forEach(card => {
+            card.style.transform = '';
+            card.style.opacity = '';
+            card.style.zIndex = '';
+            card.style.pointerEvents = '';
+          });
+        };
+      });
+
+      // MOBILE: Fluid Natural Horizontal Snap Carousel (Zero scroll traps, 100% fluid)
+      mm.add("(max-width: 940px)", () => {
+        cards.forEach(card => {
+          card.style.transform = 'none';
+          card.style.opacity = '1';
+          card.style.zIndex = '1';
+          card.style.pointerEvents = 'auto';
+        });
+
+        let indicatorWrap = document.getElementById('bucksMobileDots');
+        if (!indicatorWrap && track) {
+          indicatorWrap = document.createElement('div');
+          indicatorWrap.id = 'bucksMobileDots';
+          indicatorWrap.className = 'bucks-mobile-dots';
+          indicatorWrap.innerHTML = cards.map((_, i) => `<span class="bucks-dot ${i === 0 ? 'active' : ''}" data-index="${i}"></span>`).join('');
+          track.parentElement.appendChild(indicatorWrap);
+        }
+
+        if (track && indicatorWrap) {
+          const dots = indicatorWrap.querySelectorAll('.bucks-dot');
+          const onTrackScroll = () => {
+            const scrollLeft = track.scrollLeft;
+            const cardWidth = cards[0].offsetWidth + 16;
+            const activeIndex = Math.min(cards.length - 1, Math.max(0, Math.round(scrollLeft / cardWidth)));
+            dots.forEach((dot, idx) => {
+              dot.classList.toggle('active', idx === activeIndex);
+            });
+          };
+          track.addEventListener('scroll', onTrackScroll, { passive: true });
+        }
+      });
     }
 
-            // 4.5 CTA Strip & 3D Extintor Transition (Spinning, Approaching & Covering Screen)
+        // 4.5 CTA Strip & 3D Extintor Transition (Spinning, Zooming to 100% Screen & Seamless Footer)
     function initCtaTransition() {
       const group = document.getElementById('ctaFooterGroup');
       const footer = document.getElementById('contato');
@@ -637,9 +679,10 @@
       gsap.set(footer, { opacity: 0, pointerEvents: 'none', visibility: 'hidden' });
       if (stage) gsap.set(stage, { opacity: 1, visibility: 'visible' });
 
-      // Start state: extintor sits comfortably in center, below text and above button
-      const startRadius = Hardware.isMobile ? 520 : 480;
-      const startTargetY = Hardware.isMobile ? 0.25 : 0.28;
+      // Clean, imposing, perfectly proportioned start camera
+      const isMob = window.innerWidth <= 940;
+      const startRadius = isMob ? 210 : 220;
+      const startTargetY = isMob ? 0.14 : 0.16;
       const startFov = 45;
 
       const cam = {
@@ -652,9 +695,13 @@
       mv.cameraOrbit = `0deg 84deg ${startRadius}%`;
       mv.cameraTarget = `0m ${startTargetY.toFixed(2)}m 0m`;
       mv.fieldOfView = `${startFov}deg`;
+      gsap.set(mv, { scale: 1 });
+      if (typeof mv.jumpCameraToGoal === 'function') {
+        mv.jumpCameraToGoal();
+      }
 
-      const pinDistance = Hardware.isMobile ? '+=150%' : '+=160%';
-      const scrubSpeed = Hardware.isMobile ? 0.4 : 0.5;
+      const pinDistance = isMob ? '+=140%' : '+=160%';
+      const scrubSpeed = isMob ? 0.35 : 0.5;
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -663,6 +710,7 @@
           start: 'top top',
           end: pinDistance,
           pin: true,
+          pinSpacing: true,
           scrub: scrubSpeed,
           anticipatePin: 1,
           invalidateOnRefresh: true
@@ -676,12 +724,13 @@
 
       // 2. Extinguisher ROTATES and APPROACHES the screen (zooming to COVER THE WHOLE SCREEN)
       // theta: 0 -> 240 deg (spins dynamically in 3D)
-      // radius: 480% -> 10% (rushes directly toward camera)
+      // radius: 210% -> 12% (rushes directly toward camera)
       // fov: 45deg -> 3.5deg (super zoom: red cylinder completely covers screen)
-      // targetY: 0.28m -> 0m (smoothly centers onto red body)
+      // targetY: 0.14m -> 0m (smoothly centers onto red body)
+      // scale: 1 -> 3.2 (guarantees red cylinder covers 100% of the screen with zero gaps)
       tl.to(cam, {
         theta: 240,
-        radius: 10,
+        radius: 12,
         fov: 3.5,
         targetY: 0,
         duration: 0.72,
@@ -690,7 +739,17 @@
           mv.cameraOrbit = `${cam.theta.toFixed(1)}deg 84deg ${cam.radius.toFixed(1)}%`;
           mv.cameraTarget = `0m ${cam.targetY.toFixed(2)}m 0m`;
           mv.fieldOfView = `${cam.fov.toFixed(1)}deg`;
+          if (typeof mv.jumpCameraToGoal === 'function') {
+            mv.jumpCameraToGoal();
+          }
         }
+      }, 0.02);
+
+      tl.to(mv, {
+        scale: isMob ? 3.0 : 3.5,
+        transformOrigin: 'center center',
+        duration: 0.72,
+        ease: 'power2.in'
       }, 0.02);
 
       // 3. Stage dissolves smoothly as the red body covers the whole viewport
@@ -701,7 +760,7 @@
       // 4. Unified footer dissolves in seamlessly with video background and interactive channels
       tl.fromTo(footer,
         { opacity: 0, visibility: 'hidden', pointerEvents: 'none' },
-        { opacity: 1, visibility: 'visible', pointerEvents: 'auto', duration: 0.25, ease: 'power2.out' },
+        { opacity: 1, visibility: 'visible', pointerEvents: 'auto', duration: 0.26, ease: 'power2.out' },
         0.72
       );
     }
