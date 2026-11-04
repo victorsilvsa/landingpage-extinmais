@@ -2246,3 +2246,21 @@ html.low-perf header.scrolled {
     box-shadow: 0 0 10px rgba(245, 228, 199, 0.5);
   }
 }
+
+@media (max-width: 940px) {
+  .hero-transition-text {
+    padding: 0 20px !important;
+  }
+
+  .hero-transition-text .letter-reveal-target {
+    font-size: clamp(21px, 6vw, 30px) !important;
+    line-height: 1.18 !important;
+    margin-bottom: 12px !important;
+  }
+
+  .hero-transition-sub {
+    font-size: clamp(13px, 3.6vw, 15px) !important;
+    line-height: 1.5 !important;
+    max-width: 340px !important;
+  }
+}

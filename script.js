@@ -395,86 +395,69 @@
       maxScroll = Math.max(1, docH - winH);
     }
 
-        // 4.1 Hero Curtain / Parallax Transition
+            // 4.1 Hero Curtain & Transition Text (Active on Both Desktop & Mobile, 100% Solid Black, Zero Ghosting)
     function initHeroTransition() {
       const hero = document.getElementById('hero');
       const curtain = document.getElementById('heroCurtain');
       const transitionText = document.getElementById('heroTransitionText');
-      if (!hero) return;
+      const videoWrap = hero ? hero.querySelector('.hero-video-wrap') : null;
+      if (!hero || !curtain || !transitionText) return;
 
-      // Mobile: Native fluid parallax scroll (Zero jank, 100% fluid)
-      if (Hardware.isMobile) {
-        if (curtain) curtain.style.display = 'none';
-        if (transitionText) transitionText.style.display = 'none';
-
-        gsap.to('.hero-big-wrap', {
-          opacity: 0,
-          y: -40,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: hero,
-            start: 'top top',
-            end: 'bottom 40%',
-            scrub: true
-          }
-        });
-        return;
-      }
-
-      // Desktop: Clean, perfectly synchronized cinematic curtain transition
-      if (!curtain || !transitionText) return;
-
+      const isMob = window.innerWidth <= 940;
       const steps = gsap.utils.toArray('.curtain-step');
       const title = transitionText.querySelector('.letter-reveal-target');
       const sub = transitionText.querySelector('.hero-transition-sub');
 
+      // Initial clean state
       gsap.set(steps, { scaleY: 0, transformOrigin: 'top center' });
       gsap.set(transitionText, { opacity: 0, visibility: 'hidden' });
-      if (title) gsap.set(title, { opacity: 0, y: 20 });
-      if (sub) gsap.set(sub, { opacity: 0, y: 15 });
+      if (title) gsap.set(title, { opacity: 0, y: isMob ? 14 : 20 });
+      if (sub) gsap.set(sub, { opacity: 0, y: isMob ? 10 : 15 });
+      if (videoWrap) gsap.set(videoWrap, { opacity: 1 });
 
       const tl = gsap.timeline();
 
-      // Phase 1: Hero content fades and lifts
+      // Phase 1: Hero content fades and lifts cleanly
       tl.to('.hero-big-wrap, .scroll-indicator', {
         opacity: 0,
-        y: -30,
-        duration: 0.3,
+        y: isMob ? -20 : -30,
+        duration: 0.25,
         ease: 'power1.out'
       }, 0)
       // Phase 2: Curtain steps cascade down smoothly
       .to(steps, {
         scaleY: 1,
-        stagger: 0.02,
+        stagger: isMob ? 0.015 : 0.02,
         ease: 'power2.inOut',
-        duration: 0.5,
+        duration: 0.45,
         transformOrigin: 'top center'
-      }, 0.1)
-      .to('.hero-video-wrap', { opacity: 0.1, duration: 0.3 }, 0.4)
-      // Phase 3: Transition text reveals with authority
-      .set(transitionText, { visibility: 'visible' }, 0.45)
-      .to(transitionText, { opacity: 1, duration: 0.25 }, 0.45)
-      .to(title, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.5)
-      .to(sub, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0.55)
-      // Pause to read the message
-      .to({}, { duration: 0.35 })
+      }, 0.08)
+      // ZERO GHOSTING: hero image fades completely to 0 (100% pitch black solid background)
+      .to(videoWrap, { opacity: 0, duration: 0.28, ease: 'power1.out' }, 0.12)
+      // Phase 3: Transition text reveals with authority against solid pure black
+      .set(transitionText, { visibility: 'visible' }, 0.42)
+      .to(transitionText, { opacity: 1, duration: 0.22 }, 0.42)
+      .to(title, { opacity: 1, y: 0, duration: 0.28, ease: 'power2.out' }, 0.46)
+      .to(sub, { opacity: 1, y: 0, duration: 0.24, ease: 'power2.out' }, 0.50)
+      // Pause to comfortably read the message
+      .to({}, { duration: isMob ? 0.25 : 0.35 })
       // Phase 4: Clean dissolve and curtain exit
-      .to(transitionText, { opacity: 0, y: -16, duration: 0.25, ease: 'power2.in' })
+      .to(transitionText, { opacity: 0, y: -16, duration: 0.22, ease: 'power2.in' })
       .to(steps, {
         scaleY: 0,
         transformOrigin: 'bottom center',
-        stagger: 0.02,
+        stagger: isMob ? 0.015 : 0.02,
         ease: 'power2.inOut',
-        duration: 0.5
+        duration: 0.45
       });
 
       ScrollTrigger.create({
         trigger: hero,
         start: 'top top',
-        end: '+=100%',
+        end: isMob ? '+=110%' : '+=125%',
         pin: true,
         pinSpacing: true,
-        scrub: 0.5,
+        scrub: isMob ? 0.35 : 0.5,
         invalidateOnRefresh: true,
         anticipatePin: 1,
         animation: tl,
