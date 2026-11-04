@@ -395,14 +395,14 @@
       maxScroll = Math.max(1, docH - winH);
     }
 
-    // 4.1 Hero Curtain / Parallax Transition
+        // 4.1 Hero Curtain / Parallax Transition
     function initHeroTransition() {
       const hero = document.getElementById('hero');
       const curtain = document.getElementById('heroCurtain');
       const transitionText = document.getElementById('heroTransitionText');
       if (!hero) return;
 
-      // Mobile: Native fluid scroll without pinning traps
+      // Mobile: Native fluid parallax scroll (Zero jank, 100% fluid)
       if (Hardware.isMobile) {
         if (curtain) curtain.style.display = 'none';
         if (transitionText) transitionText.style.display = 'none';
@@ -414,14 +414,14 @@
           scrollTrigger: {
             trigger: hero,
             start: 'top top',
-            end: 'bottom top',
+            end: 'bottom 40%',
             scrub: true
           }
         });
         return;
       }
 
-      // Desktop: Snappy, short cinematic curtain transition (only +=75% scroll distance)
+      // Desktop: Clean, perfectly synchronized cinematic curtain transition
       if (!curtain || !transitionText) return;
 
       const steps = gsap.utils.toArray('.curtain-step');
@@ -429,48 +429,61 @@
       const sub = transitionText.querySelector('.hero-transition-sub');
 
       gsap.set(steps, { scaleY: 0, transformOrigin: 'top center' });
-      gsap.set(transitionText, { opacity: 0 });
-      if (title) gsap.set(title, { opacity: 0, y: 15 });
-      if (sub) gsap.set(sub, { opacity: 0, y: 10 });
+      gsap.set(transitionText, { opacity: 0, visibility: 'hidden' });
+      if (title) gsap.set(title, { opacity: 0, y: 20 });
+      if (sub) gsap.set(sub, { opacity: 0, y: 15 });
 
       const tl = gsap.timeline();
 
+      // Phase 1: Hero content fades and lifts
       tl.to('.hero-big-wrap, .scroll-indicator', {
         opacity: 0,
-        y: -20,
-        duration: 0.35,
+        y: -30,
+        duration: 0.3,
         ease: 'power1.out'
       }, 0)
+      // Phase 2: Curtain steps cascade down smoothly
       .to(steps, {
         scaleY: 1,
-        stagger: 0.025,
-        ease: 'power2.inOut',
-        duration: 0.65,
-        transformOrigin: 'top center'
-      }, 0.1)
-      .to('.hero-video-wrap', { opacity: 0, duration: 0.25 }, 0.55)
-      .to(transitionText, { opacity: 1, duration: 0.2 }, 0.65)
-      .to(title, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out' }, 0.7)
-      .to(sub, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.75)
-      .to({}, { duration: 0.4 })
-      .to(transitionText, { opacity: 0, y: -12, duration: 0.25, ease: 'power2.in' })
-      .to(steps, {
-        yPercent: 100,
         stagger: 0.02,
         ease: 'power2.inOut',
-        duration: 0.65
+        duration: 0.5,
+        transformOrigin: 'top center'
+      }, 0.1)
+      .to('.hero-video-wrap', { opacity: 0.1, duration: 0.3 }, 0.4)
+      // Phase 3: Transition text reveals with authority
+      .set(transitionText, { visibility: 'visible' }, 0.45)
+      .to(transitionText, { opacity: 1, duration: 0.25 }, 0.45)
+      .to(title, { opacity: 1, y: 0, duration: 0.3, ease: 'power2.out' }, 0.5)
+      .to(sub, { opacity: 1, y: 0, duration: 0.25, ease: 'power2.out' }, 0.55)
+      // Pause to read the message
+      .to({}, { duration: 0.35 })
+      // Phase 4: Clean dissolve and curtain exit
+      .to(transitionText, { opacity: 0, y: -16, duration: 0.25, ease: 'power2.in' })
+      .to(steps, {
+        scaleY: 0,
+        transformOrigin: 'bottom center',
+        stagger: 0.02,
+        ease: 'power2.inOut',
+        duration: 0.5
       });
 
       ScrollTrigger.create({
         trigger: hero,
         start: 'top top',
-        end: '+=80%',
+        end: '+=100%',
         pin: true,
         pinSpacing: true,
-        scrub: 0.45,
+        scrub: 0.5,
         invalidateOnRefresh: true,
         anticipatePin: 1,
-        animation: tl
+        animation: tl,
+        onLeave: () => {
+          gsap.set([curtain, transitionText], { visibility: 'hidden' });
+        },
+        onEnterBack: () => {
+          gsap.set([curtain, transitionText], { visibility: 'visible' });
+        }
       });
     }
 
@@ -612,7 +625,7 @@
       .to({}, { duration: 0.25 });
     }
 
-    // 4.5 CTA Strip & 3D Extintor Transition (Full Cinematic Zoom on Mobile & Desktop)
+        // 4.5 CTA Strip & 3D Extintor Transition (Full Cinematic Zoom on Mobile & Desktop)
     function initCtaTransition() {
       const group = document.getElementById('ctaFooterGroup');
       const footer = document.getElementById('contato');
@@ -623,20 +636,15 @@
       // Footer begins hidden behind the 3D extintor stage
       gsap.set(footer, { opacity: 0, pointerEvents: 'none', visibility: 'hidden' });
 
-      // Initial responsive 3D camera settings (Golden ratio balance - no text collision)
-      const initialRadius = Hardware.isMobile ? 600 : 580;
-      const initialFov = Hardware.isMobile ? 44 : 42;
-      const targetRadius = Hardware.isMobile ? 18 : 14;
-      const targetFov = Hardware.isMobile ? 6 : 5;
-
-      const cam = { theta: 0, radius: initialRadius, fov: initialFov };
+      // Initial clean camera settings
       if (mv) {
-        mv.cameraOrbit = `0deg 84deg ${initialRadius}%`;
-        mv.fieldOfView = `${initialFov}deg`;
+        mv.cameraOrbit = '0deg 84deg 105%';
+        mv.fieldOfView = '45deg';
+        gsap.set(mv, { scale: 1 });
       }
 
-      const pinDistance = Hardware.isMobile ? '+=150%' : '+=160%';
-      const scrubSpeed = Hardware.isMobile ? 0.45 : 0.6;
+      const pinDistance = Hardware.isMobile ? '+=120%' : '+=130%';
+      const scrubSpeed = Hardware.isMobile ? 0.35 : 0.5;
 
       const tl = gsap.timeline({
         scrollTrigger: {
@@ -651,36 +659,30 @@
         }
       });
 
-      tl.to('.cta-content-top', { opacity: 0, y: -24, duration: 0.22 }, 0)
-        .to('.cta-content-bottom', { opacity: 0, y: 24, duration: 0.22 }, 0)
-        .to('#extintorHalo', { opacity: 0, duration: 0.2 }, 0);
+      // 1. CTA Text and halo fade out cleanly
+      tl.to('.cta-content-top', { opacity: 0, y: -24, duration: 0.25, ease: 'power1.out' }, 0)
+        .to('.cta-content-bottom', { opacity: 0, y: 24, duration: 0.25, ease: 'power1.out' }, 0)
+        .to('#extintorHalo', { opacity: 0, duration: 0.25 }, 0);
 
-      if (stage) {
-        tl.to(stage, { y: 0, duration: 0.6, ease: 'power2.out' }, 0);
-      }
-
+      // 2. Extinguisher approaches the viewer (zooming smoothly into camera)
       if (mv) {
-        tl.to(cam, {
-          theta: 180,
-          radius: targetRadius,
-          fov: targetFov,
-          duration: 0.75,
-          ease: 'power2.in',
-          onUpdate: () => {
-            mv.cameraOrbit = `${cam.theta.toFixed(1)}deg 84deg ${cam.radius.toFixed(1)}%`;
-            mv.fieldOfView = `${cam.fov.toFixed(1)}deg`;
-          }
-        }, 0.02);
+        tl.to(mv, {
+          scale: Hardware.isMobile ? 2.8 : 3.4,
+          duration: 0.72,
+          ease: 'power2.in'
+        }, 0.05);
       }
 
+      // 3. Stage dissolves smoothly at peak approach
       if (stage) {
-        tl.to(stage, { opacity: 0, duration: 0.18, ease: 'power1.out' }, 0.75);
+        tl.to(stage, { opacity: 0, duration: 0.2, ease: 'power1.out' }, 0.70);
       }
 
+      // 4. Footer dissolves in seamlessly
       tl.fromTo(footer,
         { opacity: 0, visibility: 'hidden', pointerEvents: 'none' },
-        { opacity: 1, visibility: 'visible', pointerEvents: 'auto', duration: 0.24, ease: 'power2.out' },
-        0.76
+        { opacity: 1, visibility: 'visible', pointerEvents: 'auto', duration: 0.25, ease: 'power2.out' },
+        0.72
       );
     }
 

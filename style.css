@@ -1507,12 +1507,11 @@ section {
   inset: 0;
   width: 100%;
   height: 100%;
-  transform: translateY(clamp(32px, 5.5vh, 56px));
-  z-index: 11;
-  pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  pointer-events: none;
+  z-index: 11;
   overflow: visible;
 }
 
@@ -1521,8 +1520,8 @@ section {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: min(380px, 75vw);
-  height: min(380px, 75vw);
+  width: min(320px, 70vw);
+  height: min(320px, 70vw);
   border-radius: 50%;
   background: radial-gradient(circle, rgba(200, 164, 107, 0.22) 0%, rgba(200, 164, 107, 0.04) 55%, transparent 75%);
   pointer-events: none;
@@ -1531,12 +1530,14 @@ section {
 
 .cta-extintor-stage model-viewer {
   position: relative;
-  width: 100%;
-  height: 100%;
+  width: min(340px, 80vw);
+  height: clamp(260px, 42vh, 400px);
+  max-height: 44vh;
   pointer-events: none;
   z-index: 2;
   --poster-color: transparent;
   background: transparent;
+  will-change: transform, opacity;
 }
 
 /* ==========================================================================
@@ -2036,7 +2037,6 @@ footer#contato {
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    transform: translateY(clamp(24px, 4.8vh, 44px)) !important;
     max-height: none !important;
     margin: 0 !important;
     z-index: 11 !important;
@@ -2047,9 +2047,11 @@ footer#contato {
   }
 
   .cta-extintor-stage model-viewer {
-    width: 100% !important;
-    height: 100% !important;
+    width: min(270px, 75vw) !important;
+    height: clamp(210px, 34vh, 290px) !important;
+    max-height: 36vh !important;
     pointer-events: none !important;
+    will-change: transform, opacity !important;
   }
 
   .cta-content-bottom {
