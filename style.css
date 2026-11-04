@@ -2218,12 +2218,30 @@ html.low-perf header.scrolled {
   background: rgba(8, 8, 8, 0.98) !important;
 }
 
-/* Bucks Mobile Pagination Indicators */
+/* ==========================================================================
+   MOBILE DEDICATED POLISH (Max-Width: 940px)
+   ========================================================================== */
 .bucks-mobile-dots {
   display: none;
 }
 
 @media (max-width: 940px) {
+  .hero-transition-text {
+    padding: 0 20px !important;
+  }
+
+  .hero-transition-text .letter-reveal-target {
+    font-size: clamp(20px, 5.6vw, 28px) !important;
+    line-height: 1.18 !important;
+    margin-bottom: 12px !important;
+  }
+
+  .hero-transition-sub {
+    font-size: clamp(13px, 3.4vw, 15px) !important;
+    line-height: 1.5 !important;
+    max-width: 320px !important;
+  }
+
   .bucks-mobile-dots {
     display: flex;
     justify-content: center;
@@ -2245,23 +2263,5 @@ html.low-perf header.scrolled {
     width: 24px;
     background: var(--cream);
     box-shadow: 0 0 10px rgba(245, 228, 199, 0.5);
-  }
-}
-
-@media (max-width: 940px) {
-  .hero-transition-text {
-    padding: 0 20px !important;
-  }
-
-  .hero-transition-text .letter-reveal-target {
-    font-size: clamp(21px, 6vw, 30px) !important;
-    line-height: 1.18 !important;
-    margin-bottom: 12px !important;
-  }
-
-  .hero-transition-sub {
-    font-size: clamp(13px, 3.6vw, 15px) !important;
-    line-height: 1.5 !important;
-    max-width: 340px !important;
   }
 }

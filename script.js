@@ -1,11 +1,12 @@
 /* ==========================================================================
-   EXTINMAIS — HIGH-PERFORMANCE CINEMATIC ENGINE
-   Modular, Fluid, 60-120 FPS Architecture (Zero Reflow & GPU-Optimized)
+   EXTINMAIS — HIGH-PERFORMANCE KINETIC & 3D SYSTEM
+   Awwwards Caliber Architecture, 60-120 FPS Fluid Motion, Zero Console Violations
    ========================================================================== */
+
 (function () {
   'use strict';
 
-  // 1. Force instant top reset on reload
+  // 1. Reset scroll restoration on manual reload
   if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
   }
@@ -15,7 +16,7 @@
   gsap.registerPlugin(ScrollTrigger);
   ScrollTrigger.config({
     ignoreMobileResize: true,
-    autoRefreshEvents: "visibilitychange,DOMContentLoaded,load"
+    autoRefreshEvents: "visibilitychange,DOMContentLoaded,load,resize"
   });
 
   /* ==========================================================================
@@ -31,7 +32,6 @@
     const conn = navigator.connection;
     const isDataSaver = !!(conn && (conn.saveData || /2g|3g/.test(conn.effectiveType)));
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-    const isMobile = window.innerWidth <= 940;
 
     let isLowTierGPU = false;
     try {
@@ -56,12 +56,11 @@
 
     return {
       isTouch,
-      isMobile,
+      get isMobile() { return window.matchMedia('(max-width: 940px)').matches; },
       isLowEnd,
       isUltraLowEnd,
-      // Cap DPR to 1.0 for mobile and low-perf, max 1.25 on high-end desktop (saves 75% GPU fillrate)
-      dpr: isMobile || isLowEnd ? 1.0 : Math.min(window.devicePixelRatio || 1, 1.25),
-      frameStride: isMobile ? 3 : (isLowEnd ? 2 : 1)
+      dpr: isTouch || isLowEnd ? 1.0 : Math.min(window.devicePixelRatio || 1, 1.25),
+      frameStride: isTouch ? 3 : (isLowEnd ? 2 : 1)
     };
   })();
 
@@ -69,25 +68,18 @@
   gsap.ticker.lagSmoothing(400, 33);
 
   /* ==========================================================================
-     MODULE 2: CANVAS BACKGROUND ENGINE (Zero-Jank Stream & Smart Sampling)
+     MODULE 2: CANVAS BACKGROUND ENGINE (Zero-Jank GSAP Stream)
      ========================================================================== */
   const CanvasEngine = (() => {
     const canvas = document.getElementById('bg-canvas');
-    if (!canvas) return { init: () => {}, updateTarget: () => {}, resize: () => {} };
+    if (!canvas) return { init: () => {}, render: () => {}, resize: () => {}, streamRemaining: () => {} };
 
     const ctx = canvas.getContext('2d', { alpha: false });
     const totalFrames = 240;
     const frameStride = Hardware.frameStride;
     const images = new Array(totalFrames);
-
-    const frameState = { current: 0 };
-    let targetFrame = 0;
-    let lastRenderedFrame = -1;
-    let rafId = null;
-    let isLoopActive = false;
-
-    // Cache of loaded indices for O(1) nearest-frame lookup
     const loadedIndices = [];
+    let lastRenderedFrame = -1;
 
     function getFrameUrl(i) {
       const n = String(i + 1).padStart(3, '0');
@@ -101,13 +93,16 @@
       canvas.height = Math.round(h * Hardware.dpr);
       if (ctx) {
         ctx.imageSmoothingEnabled = true;
-        ctx.imageSmoothingQuality = 'medium'; // Fast bilinear (no expensive bicubic shader passes)
+        ctx.imageSmoothingQuality = 'medium';
       }
-      render(Math.round(frameState.current));
+      if (lastRenderedFrame >= 0) {
+        render(lastRenderedFrame);
+      }
     }
 
     function render(index) {
       if (!ctx || !canvas.width) return;
+      if (index === lastRenderedFrame) return;
 
       let img = images[index];
       // Fast fallback to nearest loaded frame
@@ -145,67 +140,14 @@
       }
 
       ctx.drawImage(img, offsetX, offsetY, drawW, drawH);
-    }
-
-    function step() {
-      const delta = targetFrame - frameState.current;
-      if (Math.abs(delta) > 0.05) {
-        frameState.current += delta * 0.35; // Snappy lerp, no trailing lag
-        const rounded = Math.round(frameState.current);
-        if (rounded !== lastRenderedFrame) {
-          render(rounded);
-          lastRenderedFrame = rounded;
-        }
-        rafId = requestAnimationFrame(step);
-      } else {
-        frameState.current = targetFrame;
-        const rounded = Math.round(frameState.current);
-        if (rounded !== lastRenderedFrame) {
-          render(rounded);
-          lastRenderedFrame = rounded;
-        }
-        isLoopActive = false;
-        rafId = null;
-      }
-    }
-
-    function requestTick() {
-      if (!isLoopActive) {
-        isLoopActive = true;
-        rafId = requestAnimationFrame(step);
-      }
-    }
-
-        function updateTarget(scrollY, maxScroll) {
-      if (maxScroll <= 0) return;
-      const hero = document.getElementById('hero');
-      // While inside hero pinned transition, keep canvas locked on frame 0
-      const heroThreshold = hero ? (hero.offsetHeight * 1.15) : window.innerHeight;
-      if (scrollY <= heroThreshold) {
-        if (targetFrame !== 0) {
-          targetFrame = 0;
-          requestTick();
-        }
-        return;
-      }
-      const effectiveY = scrollY - heroThreshold;
-      const effectiveMax = Math.max(1, maxScroll - heroThreshold);
-      const progress = Math.max(0, Math.min(1, effectiveY / effectiveMax));
-      const newTarget = progress * (totalFrames - 1);
-      if (Math.abs(newTarget - targetFrame) > 0.1) {
-        targetFrame = newTarget;
-        requestTick();
-      }
+      lastRenderedFrame = index;
     }
 
     // Load initial critical frames
     function init(onFirstLoaded) {
       resize();
 
-      // Key initial frames
       const initialIndices = [0, 5, 15, 30, 60, 90, 120, 180, 239];
-      let loadedCount = 0;
-
       initialIndices.forEach(idx => {
         const img = new Image();
         img.decoding = 'async';
@@ -264,7 +206,7 @@
       }
     }
 
-    return { init, updateTarget, resize, streamRemaining };
+    return { init, render, resize, streamRemaining, totalFrames };
   })();
 
   /* ==========================================================================
@@ -336,7 +278,6 @@
         onComplete: () => dismiss(onCompleteCallback)
       });
 
-      // Safety fallback (maximum 2.2s)
       setTimeout(() => {
         if (!released) {
           tween.progress(1);
@@ -351,7 +292,6 @@
 
       if (percentEl) percentEl.textContent = '100';
 
-      // Split aperture curtain animation
       gsap.to(['.loading-content', '.loading-logo-wrap'], {
         opacity: 0,
         duration: 0.25,
@@ -378,7 +318,6 @@
             if (el.parentNode) el.parentNode.removeChild(el);
           }
           document.body.style.overflow = '';
-          window.scrollTo(0, 0);
           if (callback) callback();
         }
       });
@@ -388,26 +327,11 @@
   })();
 
   /* ==========================================================================
-     MODULE 4: SCROLL & SECTION TRANSITIONS
+     MODULE 4: SCROLL & SECTION ORCHESTRATION
      ========================================================================== */
   const ScrollOrchestrator = (() => {
-    if (typeof ScrollTrigger !== 'undefined') {
-      ScrollTrigger.config({ ignoreMobileResize: true });
-    }
-    let docH = 0;
-    let winH = window.innerHeight;
-    let maxScroll = 1;
 
-    function updateMetrics() {
-      winH = window.innerHeight;
-      docH = Math.max(
-        document.body ? document.body.scrollHeight : 0,
-        document.documentElement ? document.documentElement.scrollHeight : 0
-      );
-      maxScroll = Math.max(1, docH - winH);
-    }
-
-                // 4.1 Hero Curtain & Transition Text (Seamless Transition to #sobre, Solid Black, Zero Premature Body Reveals)
+    // 4.1 Hero Curtain & Transition Text (Seamless, Solid Black, Zero Premature Flashes)
     function initHeroTransition() {
       const hero = document.getElementById('hero');
       const curtain = document.getElementById('heroCurtain');
@@ -415,7 +339,7 @@
       const videoWrap = hero ? hero.querySelector('.hero-video-wrap') : null;
       if (!hero || !curtain || !transitionText) return;
 
-      const isMob = window.innerWidth <= 940;
+      const isMob = Hardware.isMobile;
       const steps = gsap.utils.toArray('.curtain-step');
       const title = transitionText.querySelector('.letter-reveal-target');
       const sub = transitionText.querySelector('.hero-transition-sub');
@@ -452,18 +376,19 @@
       .to(title, { opacity: 1, y: 0, duration: 0.26, ease: 'power2.out' }, 0.42)
       .to(sub, { opacity: 1, y: 0, duration: 0.22, ease: 'power2.out' }, 0.46)
       // Pause to comfortably read the message
-      .to({}, { duration: isMob ? 0.30 : 0.40 })
-      // Phase 4: Clean dissolve of transition text ONLY (curtain stays solid black so body never shows through!)
+      .to({}, { duration: isMob ? 0.25 : 0.35 })
+      // Phase 4: Clean dissolve of transition text (curtain stays solid black so body never shows through!)
       .to(transitionText, { opacity: 0, y: -20, duration: 0.22, ease: 'power2.in' })
-      .to({}, { duration: 0.12 });
+      .to({}, { duration: 0.10 });
 
       ScrollTrigger.create({
+        id: 'heroPin',
         trigger: hero,
         start: 'top top',
-        end: isMob ? '+=100%' : '+=115%',
+        end: isMob ? '+=85%' : '+=95%',
         pin: true,
         pinSpacing: true,
-        scrub: isMob ? 0.35 : 0.5,
+        scrub: isMob ? 0.3 : 0.45,
         invalidateOnRefresh: true,
         anticipatePin: 1,
         animation: tl,
@@ -476,12 +401,34 @@
       });
     }
 
-    // 4.2 Sobre Section Clean Reveals (Zero Stagger Reflows)
+    // 4.2 Background Canvas Stream (Driven Directly by GSAP, Zero Competing RAF Loops)
+    function initCanvasScroll() {
+      const target = { frame: 0 };
+      const total = CanvasEngine.totalFrames || 240;
+
+      gsap.to(target, {
+        frame: total - 1,
+        ease: 'none',
+        scrollTrigger: {
+          id: 'canvasScrub',
+          trigger: '#sobre',
+          start: 'top bottom',
+          endTrigger: '#ctaFooterGroup',
+          end: 'top top',
+          scrub: 0.35,
+          onUpdate: () => {
+            CanvasEngine.render(Math.round(target.frame));
+          }
+        }
+      });
+    }
+
+    // 4.3 Sobre Section Clean Reveals
     function initSobreReveals() {
       const text = document.querySelector('.sobre-text-trigger');
       if (text) {
         gsap.fromTo(text,
-          { opacity: 0.4, y: 15 },
+          { opacity: 0, y: 24 },
           {
             opacity: 1,
             y: 0,
@@ -496,15 +443,16 @@
         );
       }
 
-      const img = document.querySelector('.sobre-clean-img');
-      if (img) {
-        gsap.fromTo(img,
-          { scale: 1.06 },
+      const imgWrapper = document.querySelector('.sobre-image-wrapper');
+      if (imgWrapper) {
+        gsap.fromTo(imgWrapper,
+          { opacity: 0.3, scale: 0.94 },
           {
+            opacity: 1,
             scale: 1,
             ease: 'power2.out',
             scrollTrigger: {
-              trigger: '.sobre-image-wrapper',
+              trigger: imgWrapper,
               start: 'top 85%',
               end: 'bottom 50%',
               scrub: 0.3
@@ -514,14 +462,13 @@
       }
     }
 
-    // 4.3 General Block Reveals with Clean Hardware Acceleration
+    // 4.4 General Block Reveals with Clean Hardware Acceleration
     function initGeneralReveals() {
       const revealElements = gsap.utils.toArray('[data-reveal]');
       if (!revealElements.length) return;
 
       gsap.set(revealElements, { opacity: 0, y: Hardware.isMobile ? 15 : 24 });
 
-      // Group elements by parent for single ScrollTrigger per card grid
       const groups = new Map();
       revealElements.forEach(el => {
         const p = el.parentElement;
@@ -533,7 +480,7 @@
         gsap.to(els, {
           opacity: 1,
           y: 0,
-          duration: Hardware.isMobile ? 0.6 : 0.8,
+          duration: Hardware.isMobile ? 0.5 : 0.7,
           ease: 'power2.out',
           stagger: 0.08,
           clearProps: 'transform',
@@ -546,7 +493,7 @@
       });
     }
 
-        // 4.4 Buck's Sauce Project Showcase (Responsive MatchMedia: Desktop Wheel + Mobile Fluid Horizontal Snap)
+    // 4.5 Buck's Sauce Project Showcase (Responsive MatchMedia: Desktop Wheel + Mobile Horizontal Snap)
     function initProjectsShowcase() {
       const section = document.getElementById('projetos');
       const cards = gsap.utils.toArray('.bucks-card');
@@ -595,9 +542,10 @@
 
         const tl = gsap.timeline({
           scrollTrigger: {
+            id: 'projectsWheel',
             trigger: section,
             start: 'top top',
-            end: '+=190%',
+            end: '+=160%',
             pin: true,
             scrub: 0.5,
             anticipatePin: 1,
@@ -645,7 +593,7 @@
           const dots = indicatorWrap.querySelectorAll('.bucks-dot');
           const onTrackScroll = () => {
             const scrollLeft = track.scrollLeft;
-            const cardWidth = cards[0].offsetWidth + 16;
+            const cardWidth = (cards[0] ? cards[0].offsetWidth : 300) + 16;
             const activeIndex = Math.min(cards.length - 1, Math.max(0, Math.round(scrollLeft / cardWidth)));
             dots.forEach((dot, idx) => {
               dot.classList.toggle('active', idx === activeIndex);
@@ -656,7 +604,7 @@
       });
     }
 
-            // 4.5 CTA Strip & 3D Extintor Transition (Spinning, Zooming to 100% Screen & Seamless Footer)
+    // 4.6 CTA Strip & 3D Extintor Transition (Spinning, Zooming to 100% Screen & Seamless Footer)
     function initCtaTransition() {
       const group = document.getElementById('ctaFooterGroup');
       const footer = document.getElementById('contato');
@@ -669,7 +617,7 @@
       if (stage) gsap.set(stage, { opacity: 1, visibility: 'visible' });
 
       // Clean, imposing, perfectly proportioned start camera
-      const isMob = window.innerWidth <= 940;
+      const isMob = Hardware.isMobile;
       const startRadius = isMob ? 210 : 220;
       const startTargetY = isMob ? 0.14 : 0.16;
       const startFov = 45;
@@ -686,7 +634,7 @@
       mv.fieldOfView = `${startFov}deg`;
       gsap.set(mv, { scale: 1 });
 
-      // Safe camera snap once model is fully loaded in memory (prevents rAF timeout in updateSource)
+      // Safe camera snap once model is fully loaded in memory (prevents rAF timeout)
       if (mv.loaded && typeof mv.jumpCameraToGoal === 'function') {
         mv.jumpCameraToGoal();
       } else {
@@ -697,7 +645,7 @@
         }, { once: true });
       }
 
-      const pinDistance = isMob ? '+=140%' : '+=160%';
+      const pinDistance = isMob ? '+=120%' : '+=140%';
       const scrubSpeed = isMob ? 0.35 : 0.5;
 
       const tl = gsap.timeline({
@@ -762,7 +710,7 @@
       );
     }
 
-    // 4.6 Card Tilt on Mouse Move (Zero Forced Reflow via Cached Rects)
+    // 4.7 Card Tilt on Mouse Move (Zero Forced Reflow via Cached Rects)
     function initCardTilt() {
       if (Hardware.isTouch || Hardware.isLowEnd) return;
       const cards = document.querySelectorAll('.service-card, .diff-card');
@@ -772,7 +720,7 @@
         let ticking = false;
 
         card.addEventListener('mouseenter', () => {
-          rect = card.getBoundingClientRect(); // Cached once on hover enter
+          rect = card.getBoundingClientRect();
         });
 
         card.addEventListener('mousemove', (e) => {
@@ -799,23 +747,14 @@
 
     return {
       init: () => {
-        updateMetrics();
-        ScrollTrigger.addEventListener('refresh', updateMetrics);
-
         initHeroTransition();
+        initCanvasScroll();
         initSobreReveals();
         initGeneralReveals();
         initProjectsShowcase();
         initCtaTransition();
         initCardTilt();
-
-        requestAnimationFrame(() => {
-          ScrollTrigger.refresh();
-          updateMetrics();
-        });
-      },
-      updateMetrics,
-      getMaxScroll: () => maxScroll
+      }
     };
   })();
 
@@ -849,7 +788,6 @@
           return;
         }
 
-        // Scroll to revealed footer inside pinned ctaFooterGroup (Desktop & Mobile)
         if (hash === '#contato') {
           const ctaGroup = document.getElementById('ctaFooterGroup');
           const st = ctaGroup ? ScrollTrigger.getById('ctaPin') : null;
@@ -886,16 +824,13 @@
       });
     }
 
-    // Passive, single RAF-throttled scroll handler
+    // Passive, single RAF-throttled scroll handler for UI classes only
     let scrollScheduled = false;
     window.addEventListener('scroll', () => {
       if (scrollScheduled) return;
       scrollScheduled = true;
       requestAnimationFrame(() => {
         const y = window.scrollY;
-
-        // Canvas frame update
-        CanvasEngine.updateTarget(y, ScrollOrchestrator.getMaxScroll());
 
         // Header style toggle
         if (header) {
@@ -924,7 +859,6 @@
           lastW = currW;
           CanvasEngine.resize();
           ScrollTrigger.refresh();
-          ScrollOrchestrator.updateMetrics();
         }
       }, 200);
     }, { passive: true });
@@ -935,15 +869,29 @@
   }
 
   /* ==========================================================================
-     INITIALIZATION BOOTSTRAP
+     INITIALIZATION BOOTSTRAP (Rock-Solid Order: Fonts -> Preloader -> Refresh)
      ========================================================================== */
   document.body.style.overflow = 'hidden';
 
   CanvasEngine.init(() => {
-    // First frame loaded: run preloader and orchestrator
+    // When first canvas frame is ready: run preloader
     Preloader.run(() => {
+      // Initialize all ScrollTriggers
       ScrollOrchestrator.init();
       CanvasEngine.streamRemaining();
+
+      // Refresh ScrollTrigger once fonts and DOM are 100% resolved
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => {
+          requestAnimationFrame(() => {
+            ScrollTrigger.refresh();
+          });
+        });
+      } else {
+        setTimeout(() => {
+          ScrollTrigger.refresh();
+        }, 100);
+      }
     });
   });
 
